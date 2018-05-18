@@ -13,6 +13,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// disable newer warnings
+#ifdef WIN32
+	#pragma message("note : CRT security warning (so we can use ol'fashion 'C' calls)")
+	#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+
 // espresso lib
 #include <espresso.hxx>
 using namespace espresso;
@@ -24,7 +31,6 @@ using namespace espresso;
 #include <iostream>
 #include <cctype>
 using namespace std;
-
 
 #include <errno.h>
 
@@ -80,7 +86,7 @@ int main(int argc, char* argv[], char* envp[])
 
 	// create argmgr to handle default switches
 	ArgMgrCLI argMgr;
-	if (!argMgr.ParseAndProcess(args))
+	if (!argMgr.ParseAndProcessArgs(args))
 	{
 		::exit(0);
 	}
