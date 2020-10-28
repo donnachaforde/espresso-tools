@@ -1,0 +1,59 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Visual Source Safe files
+*.scc
+
+# Visual Studio files
+#*.dsw
+#*.dsp
+*.ncb
+*.opt
+*.positions
+*.plg
+#*.sln
+*.suo
+*.vcproj
+#*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.VC.db
+*.VC.VC.opendb
+.vs
+ipch
+VC14Debug
+VC15Debug
+
+
+# Jetbrains CLion project directory
+.idea
+
+# CMake generated build directories
+cmake-build-*
+CMakeLists.txt
