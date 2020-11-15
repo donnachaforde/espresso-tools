@@ -4,7 +4,7 @@ Some simple CLI tools, built using standard C/C++ libraries and the espresso lib
 ***
 ## Introduction
 
-Espresso Tools consists of a handful of useful CLI tools that are portable across Windows, Unix, Linux and macOS. They all utilize the [Espresso Lib](https://github.com/donnachaforde/espresso) to handle the management of command line arguments and provide a consist help, info and versioning output.
+Espresso Tools consists of a handful of useful CLI tools that are portable across Windows, Unix, Linux and macOS. They all utilize the [espresso](https://github.com/donnachaforde/espresso) library to handle the management of command line arguments and provide a consist help, info and versioning output.
 
 ### Tools
 
@@ -25,8 +25,17 @@ The software was initially written to be used on Windows 32-bit but it has been 
 
 Whats included?
 
-* Espresso Tools - Useful CLI tools. 
-* VS2019 Project Files and solution files - For development on Windows
+| Utility        | Desciption           | Platforms  |
+| ------------- |-------------| -----|
+| bin2txt	| writes binary file to stdout as text ||
+| dec2hex		| writes a decimal integer to stdout in its raw hex equivalent format||
+| env         	| same as Unix env ||
+| memcheck    	| checks how much heap memory can be allocated by a process (by actually trying to allocate it, quickly or slowly if required). ||
+| secs2time   	| write a timestamp in seconds to stdout as 'human-readable' date and time (in the format HH:MM:SS DD/MM/YYYY)||
+| spaces2tabs 	| writes file text file to stdout, converting spaces to tabs	||
+| tabs2spaces 	| writes file text file to stdout, converting tabs to spaces	||
+
+
 
 
 ***
