@@ -15,8 +15,12 @@
 
 // disable newer warnings
 #ifdef WIN32
-	#pragma message("note : CRT security warning (so we can use ol'fashion 'C' calls)")
+	#pragma message("note : CRT security warning (so we can use ol' fashioned 'C' calls)")
 	#define _CRT_SECURE_NO_WARNINGS
+
+	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
+	#pragma warning(suppress : 4996)
+
 #endif
 
 
@@ -282,7 +286,7 @@ void ProcessFile(const Args& args)
 			nNumColumnsShown++;
 			if (nNumColumnsShown == nNumColumnsToDisplay)
 			{
-				assert(::strlen(szBuffer) <=  nNumColumnsToDisplay);
+				assert(::strlen(szBuffer) <=  (size_t)nNumColumnsToDisplay);
 				::fprintf(stdout, "    %s\n", szBuffer);
 				nNumColumnsShown = 0;
 				::memset(szBuffer, 0, (nNumColumnsToDisplay + 1));
