@@ -8,15 +8,10 @@
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+# Static & Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
 *.lai
 *.la
 *.a
@@ -31,25 +26,23 @@
 *.scc
 
 # Visual Studio files
-#*.dsw
-#*.dsp
 *.ncb
 *.opt
 *.positions
 *.plg
-#*.sln
 *.suo
 *.vcproj
-#*.vcxproj
 *.vcxproj.user
 *.vcxproj.filters
 *.VC.db
 *.VC.VC.opendb
 .vs
-ipch
-VC14Debug
-VC15Debug
 
+# Visual Studio build directories
+Debug
+Release
+Win32
+x64
 
 # Jetbrains CLion project directory
 .idea
