@@ -4,18 +4,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bin2txt", "bin2txt\bin2txtVC19.vcxproj", "{4DB5E619-4DC1-4814-ADEB-02F898C58AF9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dec2hex", "dec2hex\dec2hexVC19.vcxproj", "{57C77BDD-FB7F-4308-BBA5-B209921CEEDD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "env", "env\envVC19.vcxproj", "{F704F0F0-AE1E-40A4-8895-6BA8B910004B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memcheck", "memcheck\memcheckVC19.vcxproj", "{73CB6EC6-6734-4F72-B160-F7595AC3FD6D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "secs2time", "secs2time\secs2timeVC19.vcxproj", "{CCF2DB5A-8BBF-4383-A01B-4C9E588007D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spaces2tabs", "spaces2tabs\spaces2tabsVC19.vcxproj", "{B1D73DC0-330A-4311-95D3-6D283AA815DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tabs2spaces", "tabs2spaces\tabs2spacesVC19.vcxproj", "{07D17169-6C4F-43E4-BA39-2BDD5897F6FB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libespresso", "..\espresso\espresso-lib\src\libespressoVC19.vcxproj", "{B954229E-6D71-4154-BC24-2EB50738C4C0}"
 EndProject
