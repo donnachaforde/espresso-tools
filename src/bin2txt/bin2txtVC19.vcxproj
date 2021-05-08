@@ -58,7 +58,7 @@
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <AdditionalIncludeDirectories>D:\dev\src\espresso\espresso-lib\include;..\..\espresso-lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
