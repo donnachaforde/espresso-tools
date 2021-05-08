@@ -26,43 +26,43 @@ int main(int argc, char* argv[], char* envp[])
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 
 
 	// parse the arg list
-	if (!args.Parse())
+	if (!args.parse())
 	{
-		cout << "ERROR: Invalid option: '" << args.GetInvalidOption() << "'. Use --help for option information." << endl;
+		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
 	}
 
 
 	// check for requests for help, usage and version
-	if (args.IsPresent("help") || args.IsPresent('h') || args.IsPresent('?'))
+	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
 	{
 		cout															<< endl
-			 << args.GetProgramDescription()							<< endl
+			 << args.getProgramDescription()							<< endl
 																		<< endl 
-			 << args.GetUsage()											<< endl
+			 << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetOptionsDescriptions()							<< endl
+			 << args.getOptionsDescriptions()							<< endl
 																		<< endl
-			 << args.GetCopyrightNotice()								<< endl
-			 << args.GetBugReportingInstructions()						<< endl;
+			 << args.getCopyrightNotice()								<< endl
+			 << args.getBugReportingInstructions()						<< endl;
 
 		::exit(0);
 	}
-	else if (args.IsPresent("usage"))
+	else if (args.isPresent("usage"))
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
-	else if (args.IsPresent("version"))
+	else if (args.isPresent("version"))
 	{
-		cout << args.GetProgramName() << " " << args.GetVersion()		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
 

@@ -59,56 +59,56 @@ int main(int argc, char* argv[], char* envp[])
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 	
-	args.Add("delay",	  Arg::INTEGER, "Number of seconds to delay in between allocation increments - defaults to 1.", true);
-	args.Add("kilobytes", Arg::NOARG,	"Make increments in kilobytes - default is megabytes.");
-	args.Add("verbose",   Arg::NOARG,	"Provide detailed output, with delay in between increaments.");
+	args.add("delay",	  Arg::INTEGER, "Number of seconds to delay in between allocation increments - defaults to 1.", true);
+	args.add("kilobytes", Arg::NOARG,	"Make increments in kilobytes - default is megabytes.");
+	args.add("verbose",   Arg::NOARG,	"Provide detailed output, with delay in between increaments.");
 
-	args.AddAlias("delay", 'd');
-	args.AddAlias("kilobytes", 'k');
-	args.AddAlias("spaces", 's');
-	args.AddAlias("file", 'f');
+	args.addAlias("delay", 'd');
+	args.addAlias("kilobytes", 'k');
+	args.addAlias("spaces", 's');
+	args.addAlias("file", 'f');
 
 	// parse the arg list
-	if (!args.Parse())
+	if (!args.parse())
 	{
-		cout << "ERROR: Invalid option: '" << args.GetInvalidOption() << "'. Use --help for option information." << endl;
+		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
 	}
 
 	// check for requests for help, usage and version
-	if (args.IsPresent("help") || args.IsPresent('h') || args.IsPresent('?'))
+	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
 	{
 		cout															<< endl
-			 << args.GetProgramDescription()							<< endl
+			 << args.getProgramDescription()							<< endl
 																		<< endl 
-			 << args.GetUsage()											<< endl
+			 << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetOptionsDescriptions()							<< endl
+			 << args.getOptionsDescriptions()							<< endl
 																		<< endl
-			 << args.GetCopyrightNotice()								<< endl
-			 << args.GetBugReportingInstructions()						<< endl;
+			 << args.getCopyrightNotice()								<< endl
+			 << args.getBugReportingInstructions()						<< endl;
 
 		::exit(0);
 	}
-	else if (args.IsPresent("usage"))
+	else if (args.isPresent("usage"))
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
-	else if (args.IsPresent("version"))
+	else if (args.isPresent("version"))
 	{
-		cout << args.GetProgramName() << " " << args.GetVersion()		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
-	else if (args.IsPresent("info"))
+	else if (args.isPresent("info"))
 	{
 		cout																	<< endl
-			 << args.GetProgramName() << " " << args.GetVersion()				<< endl 
+			 << args.getProgramName() << " " << args.getVersion()				<< endl 
 																				<< endl
 			 << "Compiled: " << __TIME__ << " " << __DATE__						<< endl
 
@@ -120,8 +120,8 @@ int main(int argc, char* argv[], char* envp[])
 			 << "Built with the espresso library."								<< endl
 			 << "Built with the symapi++ library."								<< endl
 																				<< endl
-			 << args.GetCopyrightNotice()										<< endl
-			 << args.GetBugReportingInstructions()								<< endl;
+			 << args.getCopyrightNotice()										<< endl
+			 << args.getBugReportingInstructions()								<< endl;
 
 		::exit(0);
 	}
@@ -131,7 +131,7 @@ int main(int argc, char* argv[], char* envp[])
 	// examine the switches specified
 	// 
 
-	bool IsVerbose = args.IsPresent("verbose");
+	bool IsVerbose = args.isPresent("verbose");
 
 
 
@@ -144,7 +144,7 @@ int main(int argc, char* argv[], char* envp[])
 	string strUnit = "Mb";
 	
 	// check if we're being asked to do it in Kb
-	if (args.IsPresent("kilobytes"))
+	if (args.isPresent("kilobytes"))
 	{
 		nSizeofAllocUnit = (1 * 1024);
 		strUnit = "Kb";
@@ -164,11 +164,11 @@ int main(int argc, char* argv[], char* envp[])
 			{
 				cout << "Allocated " << iCount << strUnit << " (of dynamic memory)." << endl;
 
-				if (args.IsPresent("delay"))
+				if (args.isPresent("delay"))
 				{
-					if (args.IsValueSupplied("delay"))
+					if (args.isValueSupplied("delay"))
 					{
-						waitabit(args.GetNumericValue("delay"));
+						waitabit(args.getNumericValue("delay"));
 					}
 					else
 					{

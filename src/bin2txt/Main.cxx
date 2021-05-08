@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2006-2008, Donnacha Forde. All rights reserved.
+// Copyright © 2005-2008, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -59,7 +59,6 @@ void ProcessFile(const Args& args);
 
 int main(int argc, char* argv[], char* envp[])
 {
-
 	//
 	// arg parsing
 	// 
@@ -68,47 +67,48 @@ int main(int argc, char* argv[], char* envp[])
 			  argv, 
 			  "bin2txt", 
 			  "Displays binary files in text format.", 
-			  "1.0 (Beta)", 
+			  "0.9.0-beta", 
 			  "Donnacha Forde", 
-			  "2005-2007", 
+			  "2008-2021", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 
 	// specify our switches & aliases
-	args.Add("columns",	Arg::INTEGER,	"Number of hexadecimal columns to display on each line.", true);
-	args.Add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
-	args.Add("text",	Arg::NOARG,		"Display text only.");
-	args.Add("hex",		Arg::NOARG,		"Display hexadecimal only.");
+	args.add("columns",	Arg::INTEGER,	"Number of hexadecimal columns to display on each line.", true);
+	args.add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
+	args.add("text",	Arg::NOARG,		"Display text only.");
+	args.add("hex",		Arg::NOARG,		"Display hexadecimal only.");
 
-	args.AddAlias("columns", 'c');
-	args.AddAlias("file", 'f');
-	args.AddAlias("text", 't');
-	args.AddAlias("hex", 'x');
+	args.addAlias("columns", 'c');
+	args.addAlias("file", 'f');
+	args.addAlias("text", 't');
+	args.addAlias("hex", 'x');
 
 
 	// create argmgr to handle default switches
 	ArgMgrCLI argMgr;
-	if (!argMgr.ParseAndProcessArgs(args))
+	if (!argMgr.parseAndProcessArgs(args))
 	{
+		argMgr.onRequestUsage(args);
 		::exit(0);
 	}
 
 
 	// check display preferences
-	if (args.IsPresent("hex") && args.IsPresent("text"))
+	if (args.isPresent("hex") && args.isPresent("text"))
 	{
 		cout << "ERROR: Cannot display only hex and only text at once." << endl;
-		argMgr.OnArgError(args);
+		argMgr.onArgError(args);
 		::exit(0);
 	}
 
 
-	if (args.IsPresent("text") && args.IsPresent("columns"))
+	if (args.isPresent("text") && args.isPresent("columns"))
 	{
 		cout << "ERROR: Specifying number of columns in not applicable when displaying text only." << endl;
-		argMgr.OnArgError(args);
+		argMgr.onArgError(args);
 		::exit(0);
 	}
 
@@ -142,37 +142,37 @@ void ProcessFile(const Args& args)
 	//
 
 
-	bool IsDisplayHexOnly = args.IsPresent("hex");
-	bool IsDisplayTextOnly = args.IsPresent("text"); 
+	bool IsDisplayHexOnly = args.isPresent("hex");
+	bool IsDisplayTextOnly = args.isPresent("text"); 
 
 
 
 
 	// default to 16 wide
 	int nNumColumnsToDisplay = 16;
-	if (args.IsPresent("columns"))
+	if (args.isPresent("columns"))
 	{
-		nNumColumnsToDisplay = args.GetNumericValue("columns");
+		nNumColumnsToDisplay = args.getNumericValue("columns");
 	}
 
 
 	// handle the file/target
 	FILE* fdIn = NULL;
-	if (args.IsPresent("file") || args.IsTargetPresent())
+	if (args.isPresent("file") || args.isTargetPresent())
 	{
 		const char* szInputFilename = NULL; 
 
-		if (args.IsPresent("file"))
+		if (args.isPresent("file"))
 		{
-			szInputFilename = args.GetStringValue("file").c_str(); 
+			szInputFilename = args.getStringValue("file").c_str(); 
 		}
 		else
 		{
-			szInputFilename = args.GetTarget().c_str(); 
+			szInputFilename = args.getTarget().c_str(); 
 		}
 
 		// check the filename
-		if (!espresso::strings::IsValidString(szInputFilename))
+		if (!espresso::strings::isValidString(szInputFilename))
 		{
 			cout << "ERROR: Unable to process empty filename." << endl;
 			::exit(-1);

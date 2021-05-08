@@ -41,49 +41,49 @@ int main(int argc, char* argv[])
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 
 	// specify our switches
-	args.Add("date", Arg::NOARG, "Show date only.");
-	args.Add("time", Arg::NOARG, "Show time only.");
-	args.AddAlias("date", 'd');
-	args.AddAlias("time", 't');
+	args.add("date", Arg::NOARG, "Show date only.");
+	args.add("time", Arg::NOARG, "Show time only.");
+	args.addAlias("date", 'd');
+	args.addAlias("time", 't');
 
 
 	// parse the arg list
-	if (!args.Parse())
+	if (!args.parse())
 	{
-		cout << "ERROR: Invalid option: '" << args.GetInvalidOption() << "'. Use --help for option information." << endl;
+		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
 	}
 
 
 	// check for requests for help, usage and version
-	if (args.IsPresent("help") || args.IsPresent('h') || args.IsPresent('?'))
+	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
 	{
 		cout															<< endl
-			 << args.GetProgramDescription()							<< endl
+			 << args.getProgramDescription()							<< endl
 																		<< endl 
-			 << args.GetUsage()											<< endl
+			 << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetOptionsDescriptions()							<< endl
+			 << args.getOptionsDescriptions()							<< endl
 																		<< endl
-			 << args.GetCopyrightNotice()								<< endl
-			 << args.GetBugReportingInstructions()						<< endl;
+			 << args.getCopyrightNotice()								<< endl
+			 << args.getBugReportingInstructions()						<< endl;
 
 		::exit(0);
 	}
-	else if (args.IsPresent("usage"))
+	else if (args.isPresent("usage"))
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
-	else if (args.IsPresent("version"))
+	else if (args.isPresent("version"))
 	{
-		cout << args.GetProgramName() << " " << args.GetVersion()		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
 
@@ -92,13 +92,13 @@ int main(int argc, char* argv[])
 	// main processing
 	//
 
-	if (args.IsTargetPresent())
+	if (args.isTargetPresent())
 	{
 		//
 		// check range - devnote: time_t is defined as a long, not an unsigned long so use one to convert & perform the test
 		// 
 
-		unsigned long ul = ::strtoul(args.GetTarget().c_str(), 0, 10);
+		unsigned long ul = ::strtoul(args.getTarget().c_str(), 0, 10);
 
 		 // time_t is a long, but time is measure in secs since epoch
 		if ((ul > 2147483647) || (ul < 0))
@@ -113,13 +113,13 @@ int main(int argc, char* argv[])
 		//
 
 		// get the target value & turn time_t into something useful & format the time structure (e.g. 15:45:00 16/11/2001)
-		time_t nTimeInSecs = ::atol(args.GetTarget().c_str());
+		time_t nTimeInSecs = ::atol(args.getTarget().c_str());
 		struct tm* UTCTime = ::gmtime(&nTimeInSecs);
 
 
 		// convert the timestamp format
 		char szBuffer[19 + 1] = "";
-		if (args.IsPresent("date") && args.IsPresent("time"))
+		if (args.isPresent("date") && args.isPresent("time"))
 		{
 			::sprintf(szBuffer, "%02u:%02u:%02u %02u/%02u/%04u", UTCTime->tm_hour,
 																 UTCTime->tm_min,
@@ -128,14 +128,14 @@ int main(int argc, char* argv[])
 										   						 (UTCTime->tm_mon + 1),			// months count from 0
 																 (UTCTime->tm_year + 1900));	// years since 1900
 		}
-		else if (args.IsPresent("date"))
+		else if (args.isPresent("date"))
 		{
 			::sprintf(szBuffer, "%02u/%02u/%04u", UTCTime->tm_mday,				
 										   		  (UTCTime->tm_mon + 1),		// months count from 0
 												  (UTCTime->tm_year + 1900));	// years since 1900
 
 		}
-		else if (args.IsPresent("time"))
+		else if (args.isPresent("time"))
 		{
 			::sprintf(szBuffer, "%02u:%02u:%02u", UTCTime->tm_hour,
 											      UTCTime->tm_min,
@@ -155,9 +155,9 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 	}
 
 	return 0;

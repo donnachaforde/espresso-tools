@@ -13,6 +13,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// disable newer warnings
+#ifdef WIN32
+	#pragma message("note : CRT security warning (so we can use ol' fashioned 'C' calls)")
+	#define _CRT_SECURE_NO_WARNINGS
+
+	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
+	//#pragma warning(suppress : 4996)
+	#pragma warning(disable : 4996)
+
+#endif
+
 
 // espresso lib
 #include <espresso.hxx>
@@ -61,49 +72,49 @@ int main(int argc, char* argv[], char* envp[])
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 
 	// specify our switches & aliases
-	args.Add("spaces",	Arg::INTEGER,	"Number of spaces to replace <TAB> with.", true);
-	args.Add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
+	args.add("spaces",	Arg::INTEGER,	"Number of spaces to replace <TAB> with.", true);
+	args.add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
 	
-	args.AddAlias("spaces", 's');
-	args.AddAlias("file", 'f');
+	args.addAlias("spaces", 's');
+	args.addAlias("file", 'f');
 
 	// parse the arg list
-	if (!args.Parse())
+	if (!args.parse())
 	{
-		cout << "ERROR: Invalid option: '" << args.GetInvalidOption() << "'. Use --help for option information." << endl;
+		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
 	}
 
 
 	// check for requests for help, usage and version
-	if (args.IsPresent("help") || args.IsPresent('h') || args.IsPresent('?'))
+	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
 	{
 		cout															<< endl
-			 << args.GetProgramDescription()							<< endl
+			 << args.getProgramDescription()							<< endl
 																		<< endl 
-			 << args.GetUsage()											<< endl
+			 << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetOptionsDescriptions()							<< endl
+			 << args.getOptionsDescriptions()							<< endl
 																		<< endl
-			 << args.GetCopyrightNotice()								<< endl
-			 << args.GetBugReportingInstructions()						<< endl;
+			 << args.getCopyrightNotice()								<< endl
+			 << args.getBugReportingInstructions()						<< endl;
 
 		::exit(0);
 	}
-	else if (args.IsPresent("usage"))
+	else if (args.isPresent("usage"))
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
-	else if (args.IsPresent("version"))
+	else if (args.isPresent("version"))
 	{
-		cout << args.GetProgramName() << " " << args.GetVersion()		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
+			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
 
@@ -113,15 +124,15 @@ int main(int argc, char* argv[], char* envp[])
 	//
 
 	int nNumSpacesToWrite = 4;
-	if (args.IsPresent("spaces"))
+	if (args.isPresent("spaces"))
 	{
-		nNumSpacesToWrite = args.GetNumericValue("spaces");
+		nNumSpacesToWrite = args.getNumericValue("spaces");
 	}
 
 	
 	FILE* fdIn = NULL;
 
-	if (args.IsPresent("file") || args.IsTargetPresent())
+	if (args.isPresent("file") || args.isTargetPresent())
 	{
 		//
 		// open the input file
@@ -129,17 +140,17 @@ int main(int argc, char* argv[], char* envp[])
 		
 		const char* szInputFilename = NULL; 
 
-		if (args.IsPresent("file"))
+		if (args.isPresent("file"))
 		{
-			szInputFilename = args.GetStringValue("file").c_str(); 
+			szInputFilename = args.getStringValue("file").c_str(); 
 		}
 		else
 		{
-			szInputFilename = args.GetTarget().c_str(); 
+			szInputFilename = args.getTarget().c_str(); 
 		}
 
 		// check the filename
-		if (!espresso::strings::IsValidString(szInputFilename))
+		if (!espresso::strings::isValidString(szInputFilename))
 		{
 			cout << "ERROR: Unable to process empty filename." << endl;
 			::exit(-1);

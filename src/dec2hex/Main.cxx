@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 			  "@DonnachaForde");
 
 	// pick up default args/switches
-	args.Initialize();
+	args.addDefaults();
 
 	// specify our switches
 //	args.Add("date", Arg::NOARG, "Show date only.");
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 	// create argmgr to handle default switches
 	ArgMgrCLI argMgr;
 
-	int nRetVal = argMgr.ParseAndProcessArgs(args);
+	int nRetVal = argMgr.parseAndProcessArgs(args);
 	if (nRetVal != 0)
 	{
 		::exit(0);
@@ -60,13 +60,13 @@ int main(int argc, char* argv[])
 	// main processing
 	//
 
-	if (args.IsTargetPresent())
+	if (args.isTargetPresent())
 	{
 		//
 		// check range - devnote: time_t is defined as a long, not an unsigned long so use one to convert & perform the test
 		// 
 
-		unsigned long ul = ::strtoul(args.GetTarget().c_str(), 0, 10);
+		unsigned long ul = ::strtoul(args.getTarget().c_str(), 0, 10);
 
 		 // time_t is a long, but time is measure in secs since epoch
 		if ((ul > 2147483647) || (ul < 0))
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 		// Otherwise, carry on - it's safe to do the conversion
 		//
 
-		int nDec = ::atoi(args.GetTarget().c_str());
+		int nDec = ::atoi(args.getTarget().c_str());
 
 
 		char szBuffer[19 + 1] = "";
@@ -90,9 +90,9 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cout << args.GetUsage()											<< endl
+		cout << args.getUsage()											<< endl
 																		<< endl 
-			 << args.GetCopyrightNotice()								<< endl;
+			 << args.getCopyrightNotice()								<< endl;
 	}
 
 	return 0;
