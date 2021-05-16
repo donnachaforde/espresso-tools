@@ -87,8 +87,9 @@ int main(int argc, char* argv[], char* envp[])
 	args.addAlias("hex", 'x');
 
 
-	// create argmgr to handle default switches
-	ArgMgrCLI argMgr;
+	// create argmgr to handle default switches 	
+	StdoutArgRenderer stdoutArgRenderer; 
+	ArgMgr argMgr(stdoutArgRenderer);
 	if (!argMgr.parseAndProcessArgs(args))
 	{
 		argMgr.onRequestUsage(args);
