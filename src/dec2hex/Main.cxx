@@ -46,8 +46,7 @@ int main(int argc, char* argv[])
 
 
 	// create argmgr to handle default switches
-	ArgMgrCLI argMgr;
-
+	ArgManager argMgr = ArgManagerFactory::createInstance();
 	int nRetVal = argMgr.parseAndProcessArgs(args);
 	if (nRetVal != 0)
 	{

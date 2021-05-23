@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
 	args.addAlias("date", 'd');
 	args.addAlias("time", 't');
 
-
-	// parse the arg list
-	if (!args.parse())
+	// create an arg manager to parse the args
+	ArgManager argMgr = ArgManagerFactory::createInstance();
+	if (argMgr.parseAndProcessArgs(args) == -1)
 	{
 		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);

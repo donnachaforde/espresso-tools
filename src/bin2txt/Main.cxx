@@ -88,8 +88,9 @@ int main(int argc, char* argv[], char* envp[])
 
 
 	// create argmgr to handle default switches 	
-	StdoutArgRenderer stdoutArgRenderer; 
-	ArgMgr argMgr(stdoutArgRenderer);
+	//StdoutArgRenderer stdoutArgRenderer; 
+	//ArgMgr argMgr(stdoutArgRenderer);
+	ArgManager argMgr = ArgManagerFactory::createInstance();
 	if (!argMgr.parseAndProcessArgs(args))
 	{
 		argMgr.onRequestUsage(args);
@@ -97,21 +98,6 @@ int main(int argc, char* argv[], char* envp[])
 	}
 
 
-	// check display preferences
-	if (args.isPresent("hex") && args.isPresent("text"))
-	{
-		cout << "ERROR: Cannot display only hex and only text at once." << endl;
-		argMgr.onArgError(args);
-		::exit(0);
-	}
-
-
-	if (args.isPresent("text") && args.isPresent("columns"))
-	{
-		cout << "ERROR: Specifying number of columns in not applicable when displaying text only." << endl;
-		argMgr.onArgError(args);
-		::exit(0);
-	}
 
 	ProcessFile(args);
 

@@ -81,41 +81,12 @@ int main(int argc, char* argv[], char* envp[])
 	args.addAlias("spaces", 's');
 	args.addAlias("file", 'f');
 
-	// parse the arg list
-	if (!args.parse())
+	// create an arg manager to parse the args
+	ArgManager argMgr = ArgManagerFactory::createInstance();
+	if (argMgr.parseAndProcessArgs(args) == -1)
 	{
 		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
-	}
-
-
-	// check for requests for help, usage and version
-	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
-	{
-		cout															<< endl
-			 << args.getProgramDescription()							<< endl
-																		<< endl 
-			 << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getOptionsDescriptions()							<< endl
-																		<< endl
-			 << args.getCopyrightNotice()								<< endl
-			 << args.getBugReportingInstructions()						<< endl;
-
-		::exit(0);
-	}
-	else if (args.isPresent("usage"))
-	{
-		cout << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
-		::exit(0);
-	}
-	else if (args.isPresent("version"))
-	{
-		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
-		::exit(0);
 	}
 
 
