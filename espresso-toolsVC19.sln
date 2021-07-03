@@ -37,6 +37,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spaces2tabs", "src\spaces2t
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tabs2spaces", "src\tabs2spaces\tabs2spacesVC19.vcxproj", "{07D17169-6C4F-43E4-BA39-2BDD5897F6FB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "watch", "src\watch\watch.vcxproj", "{32E65244-C603-496C-80C1-BE5C33611659}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B954229E-6D71-4154-BC24-2EB50738C4C0} = {B954229E-6D71-4154-BC24-2EB50738C4C0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -125,6 +130,18 @@ Global
 		{07D17169-6C4F-43E4-BA39-2BDD5897F6FB}.Template|x64.Build.0 = Debug|x64
 		{07D17169-6C4F-43E4-BA39-2BDD5897F6FB}.Template|x86.ActiveCfg = Debug|Win32
 		{07D17169-6C4F-43E4-BA39-2BDD5897F6FB}.Template|x86.Build.0 = Debug|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Debug|x64.ActiveCfg = Debug|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Debug|x64.Build.0 = Debug|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Debug|x86.ActiveCfg = Debug|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Debug|x86.Build.0 = Debug|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Release|x64.ActiveCfg = Release|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Release|x64.Build.0 = Release|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Release|x86.ActiveCfg = Release|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Release|x86.Build.0 = Release|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Template|x64.ActiveCfg = Debug|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Template|x64.Build.0 = Debug|x64
+		{32E65244-C603-496C-80C1-BE5C33611659}.Template|x86.ActiveCfg = Debug|Win32
+		{32E65244-C603-496C-80C1-BE5C33611659}.Template|x86.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
