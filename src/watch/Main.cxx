@@ -30,6 +30,11 @@ using namespace std;
 #include <Windows.h>
 
 
+// declaration
+void execAndMonitorProcess(char* szCommand); 
+
+
+
 /******************************************************************************\
  ******************************************************************************
  ******************************************************************************
@@ -60,11 +65,8 @@ int main(int argc, char* argv[], char* envp[])
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (argMgr.parseAndProcessArgs(args) == -1)
-	{
-		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
-		::exit(-1);
-	}
+	int nRetCode = argMgr.parseAndProcessArgs(args);
+
 
 	// check we have required arg
 	if (!args.isPresent("exec"))
@@ -79,7 +81,7 @@ int main(int argc, char* argv[], char* envp[])
 
 
 	// search for '--exec' in the arg list
-	int iIndex = 0;
+	int iIndex = 1;
 	bool isFound = false; 
 
 	while (!isFound && iIndex < argc)
@@ -87,6 +89,9 @@ int main(int argc, char* argv[], char* envp[])
 		if (::strcmp(argv[iIndex], "--exec") == 0)
 		{
 			isFound = true; 
+
+			// bump the index so we refer to the command after the --exec switch
+			iIndex++;
 		}
 		else
 		{
@@ -95,37 +100,50 @@ int main(int argc, char* argv[], char* envp[])
 	}
 
 	// target command is everything after --exec - 	create the command string from the rest of the args
-	iIndex++;
 	assert(isFound);
 	char szTargetCommand[256] = "";
 
 	for (int i = iIndex; i < argc; i++)
 	{
 		::strcat(szTargetCommand, argv[i]);
-		::strcat(szTargetCommand, " ");
-	}
 
-
-
-	for (int i = 0; i < argc; i++)
-	{
-		if (::strcmp(argv[i], "--exec") == 0)
+		// if we have more args, add a space
+		if ((i + 1) < argc)
 		{
-
+			::strcat(szTargetCommand, " ");
 		}
 	}
 
+
+	execAndMonitorProcess(szTargetCommand);
+
+}
+
+
+void execAndMonitorProcess(char* szCommand)
+{
+	assert(szCommand != NULL); 
+
+	// convert to widestring for Win32
+	wchar_t szwCommand[512];
+	::mbstowcs(szwCommand, szCommand, (::strlen(szCommand) + 1));
 
 
 	STARTUPINFO StartInfo = { sizeof(StartInfo) };
 	PROCESS_INFORMATION ProcInfo;
 
-	
-	string strCommandLine = args.getStringValue("exec");
-	char* pchCommandLine = (char*)strCommandLine.c_str();
 
 	bool isSuccess = false;
-	isSuccess = ::CreateProcess(NULL, (LPWSTR)pchCommandLine, NULL, NULL, true, CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, NULL, NULL, &StartInfo, &ProcInfo);
+	isSuccess = ::CreateProcess(NULL, 
+								szwCommand, 
+								NULL, 
+								NULL, 
+								TRUE, 
+								CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, 
+								NULL, 
+								NULL, 
+								&StartInfo, 
+								&ProcInfo);
 
 	if (!isSuccess)
 	{
@@ -133,18 +151,21 @@ int main(int argc, char* argv[], char* envp[])
 
 		LPVOID lpMessageBuffer = NULL;
 		::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-			NULL,
-			dwError,
-			LANG_NEUTRAL,
-			(LPWSTR)&lpMessageBuffer,
-			0,
-			NULL); 
+						NULL,
+						dwError,
+						LANG_NEUTRAL,
+						(LPWSTR)&lpMessageBuffer,
+						0,
+						NULL);
 
 		cout << "ERROR: " << lpMessageBuffer << endl;
 	}
 
+	// wait until the child procdess terminates
 	::WaitForSingleObject(ProcInfo.hProcess, INFINITE);
 
-	::MessageBox(NULL,L"The monitored process has terminated.", L"Process Terminated", MB_OK);
+	::MessageBox(NULL, L"The monitored process has terminated.", L"Process Terminated", MB_OK | MB_ICONEXCLAMATION);
+
+	return;
 
 }
