@@ -129,10 +129,9 @@ void execAndMonitorProcess(char* szCommand)
 	::mbstowcs(szwCommand, szCommand, (::strlen(szCommand) + 1));
 
 
-	STARTUPINFO StartInfo = { sizeof(StartInfo) };
-	PROCESS_INFORMATION ProcInfo;
-
-
+	// kick off child process
+	STARTUPINFO startInfo = { sizeof(startInfo) };
+	PROCESS_INFORMATION procInfo;
 	bool isSuccess = false;
 	isSuccess = ::CreateProcess(NULL, 
 								szwCommand, 
@@ -142,10 +141,39 @@ void execAndMonitorProcess(char* szCommand)
 								CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, 
 								NULL, 
 								NULL, 
-								&StartInfo, 
-								&ProcInfo);
+								&startInfo, 
+								&procInfo);
 
-	if (!isSuccess)
+	if (isSuccess)
+	{
+		//
+		// wait until the child procdess terminates & then notify
+		//
+
+		cout << "INFO: Process '" << szCommand << "' started as PID=" << procInfo.dwProcessId << "." << endl;
+		::WaitForSingleObject(procInfo.hProcess, INFINITE);
+
+
+		//
+		// now, let user know the child process has terminated
+		// 
+		
+		DWORD exitCode = 0;
+		::GetExitCodeProcess(procInfo.hProcess, &exitCode);
+
+		wchar_t szwStatusMessage[512];
+		::wcscpy(szwStatusMessage, L"'");
+		::wcscat(szwStatusMessage, szwCommand);
+		::wcscat(szwStatusMessage, L"' ");
+
+		wchar_t szwProcessInfo[128];
+		::swprintf(szwProcessInfo, 128, L" (PID=%d) has terminated with exit code %d.", procInfo.dwProcessId, exitCode);
+
+		::wcscat(szwStatusMessage, szwProcessInfo);
+
+		::MessageBox(NULL, szwStatusMessage, L"Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION);
+	}
+	else
 	{
 		DWORD dwError = ::GetLastError();
 
@@ -160,12 +188,7 @@ void execAndMonitorProcess(char* szCommand)
 
 		cout << "ERROR: " << lpMessageBuffer << endl;
 	}
-
-	// wait until the child procdess terminates
-	::WaitForSingleObject(ProcInfo.hProcess, INFINITE);
-
-	::MessageBox(NULL, L"The monitored process has terminated.", L"Process Terminated", MB_OK | MB_ICONEXCLAMATION);
-
+	
 	return;
 
 }
