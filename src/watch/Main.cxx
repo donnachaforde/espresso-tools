@@ -67,57 +67,63 @@ int main(int argc, char* argv[], char* envp[])
 	ArgManager argMgr = ArgManagerFactory::createInstance();
 	int nRetCode = argMgr.parseAndProcessArgs(args);
 
-
-	// check we have required arg
-	if (!args.isPresent("exec"))
+	// proceed if a default switch hasn't been triggered
+	if (nRetCode != 1)
 	{
-		cout << "ERROR: You must specify what command to execute. Use --help for option information." << endl;
-		::exit(-1);
-	}
-
-	//
-	// everything after the --exec switch is the command we need to execute
-	//
-
-
-	// search for '--exec' in the arg list
-	int iIndex = 1;
-	bool isFound = false; 
-
-	while (!isFound && iIndex < argc)
-	{
-		if (::strcmp(argv[iIndex], "--exec") == 0)
+		// check we have required arg
+		if (!args.isPresent("exec"))
 		{
-			isFound = true; 
-
-			// bump the index so we refer to the command after the --exec switch
-			iIndex++;
+			cout << "ERROR: You must specify what command to execute. Use --help for option information." << endl;
+			::exit(-1);
 		}
-		else
+
+
+		//
+		// everything after the --exec switch is the command (and args) we need to execute
+		//
+
+		// search for '--exec' in the arg list
+		int iIndex = 1;
+		bool isFound = false;
+
+		while (!isFound && iIndex < argc)
 		{
-			iIndex++;
+			if (::strcmp(argv[iIndex], "--exec") == 0)
+			{
+				isFound = true;
+
+				// bump the index so we refer to the command after the --exec switch
+				iIndex++;
+			}
+			else
+			{
+				iIndex++;
+			}
 		}
-	}
 
-	// target command is everything after --exec - 	create the command string from the rest of the args
-	assert(isFound);
-	char szTargetCommand[256] = "";
+		// target command is everything after --exec - 	create the command string from the rest of the args
+		assert(isFound);
+		char szTargetCommand[256] = "";
 
-	for (int i = iIndex; i < argc; i++)
-	{
-		::strcat(szTargetCommand, argv[i]);
-
-		// if we have more args, add a space
-		if ((i + 1) < argc)
+		for (int i = iIndex; i < argc; i++)
 		{
-			::strcat(szTargetCommand, " ");
+			::strcat(szTargetCommand, argv[i]);
+
+			// if we have more args, add a space
+			if ((i + 1) < argc)
+			{
+				::strcat(szTargetCommand, " ");
+			}
 		}
+
+
+		//
+		// kick off and watch child process
+		//
+
+		execAndMonitorProcess(szTargetCommand);
 	}
-
-
-	execAndMonitorProcess(szTargetCommand);
 	
-	// terminate once finished watching
 	::exit(0);
 }
 
@@ -140,7 +146,7 @@ void execAndMonitorProcess(char* szCommand)
 								NULL, 
 								NULL, 
 								TRUE, 
-								CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS, 
+								0,			/* was using CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS here but want to keep console apps in same window */
 								NULL, 
 								NULL, 
 								&startInfo, 
@@ -166,8 +172,8 @@ void execAndMonitorProcess(char* szCommand)
 
 		// pop up a message box to let the user know the child process has terminated
 		wchar_t szwStatusMessage[512];
-		::swprintf(szwStatusMessage, 256, L"'%s' (PID=%d) has terminated with exit code %d.", szwCommand, procInfo.dwProcessId, exitCode);
-		::MessageBox(NULL, szwStatusMessage, L"Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION);
+		::swprintf(szwStatusMessage, 256, L"'%s' \n\n(PID=%d) has terminated with exit code %d.", szwCommand, procInfo.dwProcessId, exitCode);
+		::MessageBox(NULL, szwStatusMessage, L"watch: Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION);
 
 		cout << "INFO: Process '" << szCommand << "' (PID=" << procInfo.dwProcessId << ") completed." << endl;
 
