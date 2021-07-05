@@ -116,7 +116,9 @@ int main(int argc, char* argv[], char* envp[])
 
 
 	execAndMonitorProcess(szTargetCommand);
-
+	
+	// terminate once finished watching
+	::exit(0);
 }
 
 
@@ -157,21 +159,18 @@ void execAndMonitorProcess(char* szCommand)
 		//
 		// now, let user know the child process has terminated
 		// 
-		
+
+		// get the child process exit code
 		DWORD exitCode = 0;
 		::GetExitCodeProcess(procInfo.hProcess, &exitCode);
 
+		// pop up a message box to let the user know the child process has terminated
 		wchar_t szwStatusMessage[512];
-		::wcscpy(szwStatusMessage, L"'");
-		::wcscat(szwStatusMessage, szwCommand);
-		::wcscat(szwStatusMessage, L"' ");
-
-		wchar_t szwProcessInfo[128];
-		::swprintf(szwProcessInfo, 128, L" (PID=%d) has terminated with exit code %d.", procInfo.dwProcessId, exitCode);
-
-		::wcscat(szwStatusMessage, szwProcessInfo);
-
+		::swprintf(szwStatusMessage, 256, L"'%s' (PID=%d) has terminated with exit code %d.", szwCommand, procInfo.dwProcessId, exitCode);
 		::MessageBox(NULL, szwStatusMessage, L"Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION);
+
+		cout << "INFO: Process '" << szCommand << "' (PID=" << procInfo.dwProcessId << ") completed." << endl;
+
 	}
 	else
 	{
