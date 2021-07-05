@@ -22,6 +22,7 @@ Here's what's included in the repo:
 | secs2time   	| write a timestamp in seconds to stdout as 'human-readable' date and time (in the format HH:MM:SS DD/MM/YYYY)||
 | spaces2tabs 	| writes file text file to stdout, converting spaces to tabs	||
 | tabs2spaces 	| writes file text file to stdout, converting tabs to spaces	||
+| watch			| kicks off and monitors the specified processes, reporting when terminated	| Windows only|
 
 
 
