@@ -74,6 +74,7 @@ int main(int argc, char* argv[], char* envp[])
 	args.add("exec", Arg::STRING, "The command to execute and monitor.", true);
 	args.add("forever", Arg::NOARG, "Will keep restarting the command should it terminate.", false);
 	args.add("silent", Arg::NOARG, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
+	args.add("limit", Arg::INTEGER, "Used in conjuction with --forever to set a limit on the number of restarts.", true);
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
@@ -89,6 +90,34 @@ int main(int argc, char* argv[], char* envp[])
 			::exit(-1);
 		}
 
+		if (args.isPresent("limit") && !args.isPresent("forever"))
+		{
+			cout << "ERROR: Cannot specify --limit without also specifying --forever option." << endl;
+			::exit(-1);
+		}
+
+		/*
+		if (!args.isTargetPresent("limit"))
+		{
+			cout << "ERROR: You must specify a value with the --limit option." << endl;
+			::exit(-1);
+		}
+		*/
+
+
+		// unless a limit has been specified, this is enough to keep it going
+		long nRestartLimit = 1;
+		if (args.isPresent("limit"))
+		{
+			nRestartLimit = args.getNumericValue("limit");
+			if (nRestartLimit <= 0)
+			{
+				cout << "ERROR: The --limit value must be > 0." << endl;
+				::exit(-1);
+			}
+		}
+
+
 		// extract the target command from argv
 		char szTargetCommand[256] = "";
 		extractTargetCommand(argc, argv, szTargetCommand);
@@ -97,6 +126,7 @@ int main(int argc, char* argv[], char* envp[])
 		//
 		// kick off and watch child process
 		//
+
 
 		do
 		{
@@ -108,7 +138,13 @@ int main(int argc, char* argv[], char* envp[])
 				reportTerminationToUI(processInfo);
 			}
 
-		} while (args.isPresent("forever"));
+			// decrement our limit counter
+			if (args.isPresent("limit"))
+			{
+				nRestartLimit--;
+			}
+
+		} while (args.isPresent("forever") && (nRestartLimit > 0));
 	}
 	
 	::exit(0);
