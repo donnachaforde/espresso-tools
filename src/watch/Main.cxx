@@ -29,9 +29,19 @@ using namespace std;
 
 #include <Windows.h>
 
+struct ProcessInfo
+{
+	wchar_t szwCommand[256];
+	DWORD dwExitCode;
+	time_t nStopTime;
+	DWORD dwPID;
+};
+
 
 // declaration
-void execAndMonitorProcess(char* szCommand); 
+void execAndMonitorProcess(const char* szCommand, /*inout*/ ProcessInfo& processInfo); 
+void extractTargetCommand(int argc, char** argv, /*inout*/ char* szTargetCommand);
+void reportTerminationToUI(const ProcessInfo processInfo);
 
 
 
@@ -49,19 +59,21 @@ int main(int argc, char* argv[], char* envp[])
 	// arg parsing
 	// 
 
-	Args args(argc,
-		argv,
-		"watch",
-		"Monitors the process you provides and reports when it terminates.",
-		"0.1.0-beta",
-		"Donnacha Forde",
-		"2021",
-		"@DonnachaForde");
+	Args args(	argc,
+				argv,
+				"watch",
+				"Monitors the process you provides and reports when it terminates.",
+				"0.2.0-beta",
+				"Donnacha Forde",
+				"2021",
+				"@DonnachaForde");
 
 	// pick up default args/switches
 	args.addDefaults();
 
 	args.add("exec", Arg::STRING, "The command to execute and monitor.", true);
+	args.add("forever", Arg::NOARG, "Will keep restarting the command should it terminate.", false);
+	args.add("silent", Arg::NOARG, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
@@ -77,34 +89,60 @@ int main(int argc, char* argv[], char* envp[])
 			::exit(-1);
 		}
 
-
-		//
-		// everything after the --exec switch is the command (and args) we need to execute
-		//
-
-		// search for '--exec' in the arg list
-		int iIndex = 1;
-		bool isFound = false;
-
-		while (!isFound && iIndex < argc)
-		{
-			if (::strcmp(argv[iIndex], "--exec") == 0)
-			{
-				isFound = true;
-
-				// bump the index so we refer to the command after the --exec switch
-				iIndex++;
-			}
-			else
-			{
-				iIndex++;
-			}
-		}
-
-		// target command is everything after --exec - 	create the command string from the rest of the args
-		assert(isFound);
+		// extract the target command from argv
 		char szTargetCommand[256] = "";
+		extractTargetCommand(argc, argv, szTargetCommand);
+		assert(strings::isValidString(szTargetCommand));
 
+		//
+		// kick off and watch child process
+		//
+
+		do
+		{
+			ProcessInfo processInfo;
+			execAndMonitorProcess(szTargetCommand, processInfo);
+
+			if (!args.isPresent("silent"))
+			{
+				reportTerminationToUI(processInfo);
+			}
+
+		} while (args.isPresent("forever"));
+	}
+	
+	::exit(0);
+}
+
+
+void extractTargetCommand(int argc, char** argv, /*inout*/ char* szTargetCommand)
+{
+	//
+	// everything after the --exec switch is the command (and args) we need to execute
+	//
+
+	// search for '--exec' in the arg list
+	int iIndex = 1;
+	bool isFound = false;
+	while (!isFound && iIndex < argc)
+	{
+		if (::strcmp(argv[iIndex], "--exec") == 0)
+		{
+			isFound = true;
+
+			// bump the index so we refer to the command after the --exec switch
+			iIndex++;
+		}
+		else
+		{
+			iIndex++;
+		}
+	}
+
+	// target command is everything after --exec - 	create the command string from the rest of the args
+	assert(isFound);
+	if (isFound)
+	{
 		for (int i = iIndex; i < argc; i++)
 		{
 			::strcat(szTargetCommand, argv[i]);
@@ -115,22 +153,16 @@ int main(int argc, char* argv[], char* envp[])
 				::strcat(szTargetCommand, " ");
 			}
 		}
-
-
-		//
-		// kick off and watch child process
-		//
-
-		execAndMonitorProcess(szTargetCommand);
 	}
-	
-	::exit(0);
+
+	return;
 }
 
 
-void execAndMonitorProcess(char* szCommand)
+void execAndMonitorProcess(const char* szCommand, /*inout*/ ProcessInfo& processInfo)
 {
 	assert(szCommand != NULL); 
+	assert(strings::isValidString(szCommand));
 
 	// convert to widestring for Win32
 	wchar_t szwCommand[512];
@@ -146,7 +178,7 @@ void execAndMonitorProcess(char* szCommand)
 								NULL, 
 								NULL, 
 								TRUE, 
-								0,			/* was using CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS here but want to keep console apps in same window */
+								CREATE_NEW_CONSOLE | NORMAL_PRIORITY_CLASS | CREATE_PRESERVE_CODE_AUTHZ_LEVEL,
 								NULL, 
 								NULL, 
 								&startInfo, 
@@ -167,19 +199,22 @@ void execAndMonitorProcess(char* szCommand)
 		// 
 
 		// get the child process exit code
-		DWORD exitCode = 0;
-		::GetExitCodeProcess(procInfo.hProcess, &exitCode);
+		DWORD dwExitCode = 0;
+		::GetExitCodeProcess(procInfo.hProcess, &dwExitCode);
 
-		// pop up a message box to let the user know the child process has terminated
-		wchar_t szwStatusMessage[512];
-		::swprintf(szwStatusMessage, 256, L"'%s' \n\n(PID=%d) has terminated with exit code %d.", szwCommand, procInfo.dwProcessId, exitCode);
-		::MessageBox(NULL, szwStatusMessage, L"watch: Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION);
+		// populate process info 
+		processInfo.dwExitCode = dwExitCode;
+		processInfo.dwPID = procInfo.dwProcessId; 
+		::wcscpy(processInfo.szwCommand, szwCommand);
+		time_t nRawTimeNow;
+		::time(&nRawTimeNow);
+		processInfo.nStopTime = nRawTimeNow; 
 
 		cout << "INFO: Process '" << szCommand << "' (PID=" << procInfo.dwProcessId << ") completed." << endl;
-
 	}
 	else
 	{
+		// report why we weren't able to start the child process
 		DWORD dwError = ::GetLastError();
 
 		LPVOID lpMessageBuffer = NULL;
@@ -192,8 +227,29 @@ void execAndMonitorProcess(char* szCommand)
 						NULL);
 
 		cout << "ERROR: " << lpMessageBuffer << endl;
+
+		// free the allocated buffer
+		::LocalFree(lpMessageBuffer);
 	}
 	
 	return;
 
+}
+
+
+void reportTerminationToUI(const ProcessInfo processInfo)
+{
+	struct tm* timeInfo = ::localtime(&processInfo.nStopTime);
+	char* szStopTime = ::asctime(timeInfo); 
+	wchar_t szwStopTime[64];
+	::mbstowcs(szwStopTime, szStopTime, (::strlen(szStopTime) + 1));
+
+
+	// pop up a message box to let the user know the child process has terminated
+	wchar_t szwStatusMessage[512];
+	::swprintf(szwStatusMessage, 256, L"%s\n'%s' (PID=%d) has terminated with exit code %d.", szwStopTime, processInfo.szwCommand, processInfo.dwPID, processInfo.dwExitCode);
+	
+	::MessageBox(NULL, szwStatusMessage, L"watch: Monitored Process Terminated", MB_OK | MB_ICONEXCLAMATION | MB_SYSTEMMODAL | MB_SETFOREGROUND);
+
+	return;
 }
