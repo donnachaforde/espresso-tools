@@ -11,7 +11,7 @@ A watcher tool that monitors a process and prompts you when it terminates.
 
 ***
 ## How to use
-	$ watch --exec program.exe -l --switch
+	$ watch --exec program.exe -l --flags
 
 Or use a full path:
 
@@ -20,18 +20,6 @@ Or use a full path:
 
 __Note:__ Everything following the `--exec` switch is passed to target process as it's command-line arguments.
 
-To keep the target process running continuously - i.e. automatically restart after it terminates - use the 'forever' switch, as follows:
-
-	$ watch --forever --exec C:\myfolder\program.exe --flags
-
-If you really want to keep the process running indefinitely, then you probably don't want to see the messagebox that pops up when it terminates. In that case, use the `--silent` argument. 
-
-	$ watch --forever --silent --exec C:\myfolder\program.exe --flags
-
-
-To see all options, type:
-
-	$ watch --help
 
 
 ## What it does
@@ -55,6 +43,29 @@ e.g.
 If you've specified the `--forever` it will simply launch the command again. 
 
 __Note:__ If you wish to terminate the target process, you must first terminate 'watch' to stop it automatically restarting your target process.
+
+
+***
+## Useful Options
+
+To keep the target process running continuously - i.e. automatically restart after it terminates - use the 'forever' switch, as follows:
+
+	$ watch --forever --exec C:\myfolder\program.exe --flags
+
+If you really want to keep the process running indefinitely, then you probably don't want to see the messagebox that pops up when it terminates. In that case, use the `--silent` argument. 
+
+	$ watch --forever --silent --exec C:\myfolder\program.exe --flags
+
+And, if you want to set a limit to the number of restart attempts, then use the `--limit` option, as follows:
+
+	$ watch --forever --silent --limit 10 --exec C:\myfolder\program.exe --flags
+
+
+To see all options, type:
+
+	$ watch --help
+
+
 
 ***
 ## Supported Platforms
