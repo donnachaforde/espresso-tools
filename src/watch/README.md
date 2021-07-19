@@ -4,7 +4,7 @@ A watcher tool that monitors a process and prompts you when it terminates.
 ***
 ## Introduction
 
-'watch' is a monitoring tool that waits until the program you specify terminates and pops up a message box to grab your attention. It's purpose is to overcome programs silently terminating without you realizing it. 
+'watch' is a monitoring tool that waits until the program you specify terminates and pops up a message box to grab your attention. Its purpose is to overcome programs silently terminating without you realizing it. 
 
 
 
