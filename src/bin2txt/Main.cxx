@@ -69,7 +69,7 @@ int main(int argc, char* argv[], char* envp[])
 			  "Displays binary files in text format.", 
 			  "0.9.0-beta", 
 			  "Donnacha Forde", 
-			  "2008-2021", 
+			  "2005-2021", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches
