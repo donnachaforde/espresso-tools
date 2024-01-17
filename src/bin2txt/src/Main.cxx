@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2005-2008, Donnacha Forde. All rights reserved.
+// Copyright © 2005-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -19,8 +19,7 @@
 	#define _CRT_SECURE_NO_WARNINGS
 
 	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
-	#pragma warning(suppress : 4996)
-
+	#pragma warning(disable : 4996)
 #endif
 
 

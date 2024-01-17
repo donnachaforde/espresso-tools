@@ -6,12 +6,22 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2021, Donnacha Forde. All rights reserved.
+// Copyright © 2021-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+
+// disable newer warnings
+#ifdef WIN32
+	#pragma message("note : CRT security warning (so we can use ol' fashioned 'C' calls)")
+	#define _CRT_SECURE_NO_WARNINGS
+
+//	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
+//	#pragma warning(disable : 4996)
+#endif
 
 
 
