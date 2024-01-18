@@ -26,6 +26,10 @@ using namespace std;
 //#include <winbase.h>
 #include <windows.h>
 
+// version number
+static const char VERSION[] = "0.3.0-beta";
+
+
 
 //bool isDirectory(const char* szDirectoryName)
 //{

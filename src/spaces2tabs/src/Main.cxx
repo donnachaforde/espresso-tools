@@ -44,6 +44,8 @@ using namespace std;
 #endif
 
 
+// version number
+static const char VERSION[] = "0.1.0-beta";
 
 
 
@@ -65,7 +67,7 @@ int main(int argc, char* argv[], char* envp[])
 			  argv, 
 			  "spaces2tabs", 
 			  "Replaces spaces with tabs in text files.", 
-			  "1.0 (Beta)", 
+			  VERSION, 
 			  "Donnacha Forde", 
 			  "2006-2024", 
 			  "@DonnachaForde");

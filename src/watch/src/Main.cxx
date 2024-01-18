@@ -29,7 +29,7 @@
 #include <espresso.hxx>
 using namespace espresso;
 
-
+// crt
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
@@ -37,7 +37,14 @@ using namespace espresso;
 using namespace std;
 
 
+// windows
 #include <Windows.h>
+
+
+// version number
+static const char VERSION[] = "0.2.0-beta";
+
+
 
 struct ProcessInfo
 {
@@ -73,7 +80,7 @@ int main(int argc, char* argv[], char* envp[])
 				argv,
 				"watch",
 				"Monitors the process you provides and reports when it terminates.",
-				"0.2.0-beta",
+				VERSION,
 				"Donnacha Forde",
 				"2021-2024",
 				"@DonnachaForde");
@@ -133,10 +140,10 @@ int main(int argc, char* argv[], char* envp[])
 		extractTargetCommand(argc, argv, szTargetCommand);
 		assert(strings::isValidString(szTargetCommand));
 
+
 		//
 		// kick off and watch child process
 		//
-
 
 		do
 		{

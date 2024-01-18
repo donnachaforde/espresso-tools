@@ -44,6 +44,10 @@ using namespace std;
 #endif
 
 
+// version number
+static const char VERSION[] = "0.9.0-beta";
+
+
 // prototypes
 void ProcessFile(const Args& args);
 
@@ -66,7 +70,7 @@ int main(int argc, char* argv[], char* envp[])
 			  argv, 
 			  "bin2txt", 
 			  "Displays binary files in text format.", 
-			  "0.9.0-beta", 
+			  VERSION, 
 			  "Donnacha Forde", 
 			  "2005-2024", 
 			  "@DonnachaForde");

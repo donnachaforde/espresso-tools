@@ -45,6 +45,8 @@ using namespace std;
 	#include <unistd.h>
 #endif
 
+// version number
+static const char VERSION[] = "0.1.0-beta";
 
 
 

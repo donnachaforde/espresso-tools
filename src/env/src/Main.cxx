@@ -22,11 +22,11 @@ using namespace espresso;
 #include <iostream>
 using namespace std;
 
+// version number
+static const char VERSION[] = "0.3.0-beta";
 
-const char VERSION[] = "0.3.0-beta";
 
-
-
+// print list of env vars to stdout
 void displayEnvVars(char* envp[]);
 
 

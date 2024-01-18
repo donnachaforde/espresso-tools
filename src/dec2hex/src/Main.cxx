@@ -33,6 +33,8 @@ using namespace espresso;
 #include <cassert>
 using namespace std;
 
+// version number
+static const char VERSION[] = "0.1.0-beta";
 
 
 
@@ -54,7 +56,7 @@ int main(int argc, char* argv[])
 			  argv, 
 			  "dec2hex", 
 			  "Converts a decimal integer into its raw hex equivalent.", 
-			  "1.0 (Beta)", 
+			  VERSION, 
 			  "Donnacha Forde", 
 			  "2009-2024", 
 			  "@DonnachaForde");

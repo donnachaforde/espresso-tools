@@ -30,6 +30,10 @@ using namespace std;
 #endif
 
 
+// version number
+static const char VERSION[] = "0.1.0-beta";
+
+
 
 void waitabit(unsigned int ui = 1);
 
@@ -53,7 +57,7 @@ int main(int argc, char* argv[], char* envp[])
 			  argv, 
 			  "memcheck", 
 			  "Checks how much heap memory a process can allocate.", 
-			  "1.0 (Beta)", 
+			  VERSION, 
 			  "Donnacha Forde", 
 			  "2005-2024", 
 			  "@DonnachaForde");

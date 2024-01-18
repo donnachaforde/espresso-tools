@@ -34,6 +34,10 @@ using namespace espresso;
 using namespace std;
 
 
+// version number
+static const char VERSION[] = "0.1.0-beta";
+
+
 // format time into a timestamp understood by a database (uses a static buffer)
 char* GenerateTimestamp(time_t nTimeInSecs);
 
@@ -57,7 +61,7 @@ int main(int argc, char* argv[])
 			  argv, 
 			  "secs2time", 
 			  "Converts a timestamp in seconds to human-readable date and time (in the format HH:MM:SS DD/MM/YYYY).", 
-			  "1.0 (Beta)", 
+			  VERSION, 
 			  "Donnacha Forde", 
 			  "2001-2024", 
 			  "@DonnachaForde");
