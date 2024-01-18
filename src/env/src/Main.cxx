@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2005-2024, Donnacha Forde. All rights reserved.
+// Copyright © 2001-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -23,6 +23,24 @@ using namespace espresso;
 using namespace std;
 
 
+const char VERSION[] = "0.3.0-beta";
+
+
+
+void displayEnvVars(char* envp[]);
+
+
+void displayEnvVars(char* envp[])
+{
+	while (*envp != NULL)
+	{
+		cout << *envp++ << endl;
+	}
+
+	return;
+}
+
+
 
 int main(int argc, char* argv[], char* envp[])
 {
@@ -34,32 +52,36 @@ int main(int argc, char* argv[], char* envp[])
 			  argv, 
 			  "env", 
 			  "Displays environment settings.", 
-			  "0.2.0-beta", 
+			  VERSION, 
 			  "Donnacha Forde", 
-			  "2001-2007", 
+			  "2001-2024", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches
 	args.addDefaults();
 
-	// create an arg manager to parse the args
+	// parse args and if all okay, diplay env vars
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (argMgr.parseAndProcessArgs(args) == -1)
+	int nRetCode = argMgr.parseAndProcessArgs(args);
+
+	// env has no target arg so complain if we find one
+	if (args.isTargetPresent())
 	{
-		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
-		::exit(-1);
+		argMgr.onRequestUsage(args);
+	}
+	else
+	{
+		if (nRetCode == 0)
+		{
+			displayEnvVars(envp);
+		}
+		else if (nRetCode == -1)
+		{
+			argMgr.onRequestUsage(args);
+		}
 	}
 
 
 
-	//
-	// main processing
-	//
-
-	while (*envp != NULL)
-	{
-		cout << *envp++ << endl;
-	}
-
-	return 0;
+	::exit(0);
 }
