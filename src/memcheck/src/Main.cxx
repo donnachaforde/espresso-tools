@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2006-2024, Donnacha Forde. All rights reserved.
+// Copyright © 2005-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -55,7 +55,7 @@ int main(int argc, char* argv[], char* envp[])
 			  "Checks how much heap memory a process can allocate.", 
 			  "1.0 (Beta)", 
 			  "Donnacha Forde", 
-			  "2005-2006", 
+			  "2005-2024", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches

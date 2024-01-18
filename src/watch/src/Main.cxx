@@ -75,7 +75,7 @@ int main(int argc, char* argv[], char* envp[])
 				"Monitors the process you provides and reports when it terminates.",
 				"0.2.0-beta",
 				"Donnacha Forde",
-				"2021",
+				"2021-2024",
 				"@DonnachaForde");
 
 	// pick up default args/switches

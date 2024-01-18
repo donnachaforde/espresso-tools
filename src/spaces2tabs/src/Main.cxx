@@ -67,7 +67,7 @@ int main(int argc, char* argv[], char* envp[])
 			  "Replaces spaces with tabs in text files.", 
 			  "1.0 (Beta)", 
 			  "Donnacha Forde", 
-			  "2006-2007", 
+			  "2006-2024", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches

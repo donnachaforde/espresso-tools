@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2005-2024, Donnacha Forde. All rights reserved.
+// Copyright © 2001-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 			  "Converts a timestamp in seconds to human-readable date and time (in the format HH:MM:SS DD/MM/YYYY).", 
 			  "1.0 (Beta)", 
 			  "Donnacha Forde", 
-			  "2001-2007", 
+			  "2001-2024", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches

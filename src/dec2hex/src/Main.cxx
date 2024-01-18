@@ -6,7 +6,7 @@
 //
 // Developed by Donnacha Forde (@DonnachaForde)
 //
-// Copyright © 2005-2024, Donnacha Forde. All rights reserved.
+// Copyright © 20059-2024, Donnacha Forde. All rights reserved.
 //
 // This software is provided 'as is' without warranty, expressed or implied.
 // Donnacha Forde accepts no responsibility for the use or reliability of this software.
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 			  "Converts a decimal integer into its raw hex equivalent.", 
 			  "1.0 (Beta)", 
 			  "Donnacha Forde", 
-			  "2009", 
+			  "2009-2024", 
 			  "@DonnachaForde");
 
 	// pick up default args/switches
