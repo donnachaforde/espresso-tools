@@ -88,10 +88,10 @@ int main(int argc, char* argv[], char* envp[])
 	// pick up default args/switches
 	args.addDefaults();
 
-	args.add("exec", Arg::STRING, "The command to execute and monitor.", true);
-	args.add("forever", Arg::NOARG, "Will keep restarting the command should it terminate.", false);
-	args.add("silent", Arg::NOARG, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
-	args.add("limit", Arg::INTEGER, "Used in conjuction with --forever to set a limit on the number of restarts.", true);
+	args.add("exec",	Arg::STRING,  false, "The command to execute and monitor.", true);
+	args.add("forever", Arg::NOARG,   false, "Will keep restarting the command should it terminate.", false);
+	args.add("silent",	Arg::NOARG,   false, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
+	args.add("limit",	Arg::INTEGER, false, "Used in conjuction with --forever to set a limit on the number of restarts.", true);
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
@@ -103,7 +103,7 @@ int main(int argc, char* argv[], char* envp[])
 		// check we have required arg
 		if (!args.isPresent("exec"))
 		{
-			cout << "ERROR: You must specify what command to execute. Use --help for option information." << endl;
+			argMgr.onRequestUsage(args);
 			::exit(-1);
 		}
 

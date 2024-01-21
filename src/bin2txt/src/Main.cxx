@@ -79,10 +79,10 @@ int main(int argc, char* argv[], char* envp[])
 	args.addDefaults();
 
 	// specify our switches & aliases
-	args.add("columns",	Arg::INTEGER,	"Number of hexadecimal columns to display on each line.", true);
-	args.add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
-	args.add("text",	Arg::NOARG,		"Display text only.");
-	args.add("hex",		Arg::NOARG,		"Display hexadecimal only.");
+	args.add("columns",	Arg::INTEGER, false, "Number of hexadecimal columns to display on each line.", true);
+	args.add("file",	Arg::STRING,  true,	 "Filename to modify.", true, "filename");
+	args.add("text",	Arg::NOARG,	  false, "Display text only.");
+	args.add("hex",		Arg::NOARG,	  false, "Display hexadecimal only.");
 
 	args.addAlias("columns", 'c');
 	args.addAlias("file", 'f');

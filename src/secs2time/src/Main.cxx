@@ -70,8 +70,8 @@ int main(int argc, char* argv[])
 	args.addDefaults();
 
 	// specify our switches
-	args.add("date", Arg::NOARG, "Show date only.");
-	args.add("time", Arg::NOARG, "Show time only.");
+	args.add("date", Arg::NOARG, false, "Show date only.");
+	args.add("time", Arg::NOARG, false, "Show time only.");
 	args.addAlias("date", 'd');
 	args.addAlias("time", 't');
 

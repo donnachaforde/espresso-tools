@@ -65,9 +65,9 @@ int main(int argc, char* argv[], char* envp[])
 	// pick up default args/switches
 	args.addDefaults();
 	
-	args.add("delay",	  Arg::INTEGER, "Number of seconds to delay in between allocation increments - defaults to 1.", true);
-	args.add("kilobytes", Arg::NOARG,	"Make increments in kilobytes - default is megabytes.");
-	args.add("verbose",   Arg::NOARG,	"Provide detailed output, with delay in between increaments.");
+	args.add("delay",	  Arg::INTEGER, false, "Number of seconds to delay in between allocation increments - defaults to 1.");
+	args.add("kilobytes", Arg::NOARG,	false, "Make increments in kilobytes - default is megabytes.");
+	args.add("verbose",   Arg::NOARG,	false, "Provide detailed output, with delay in between increaments.");
 
 	args.addAlias("delay", 'd');
 	args.addAlias("kilobytes", 'k');

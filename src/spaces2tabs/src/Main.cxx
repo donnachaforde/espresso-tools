@@ -76,8 +76,8 @@ int main(int argc, char* argv[], char* envp[])
 	args.addDefaults();
 
 	// specify our switches & aliases
-	args.add("spaces",	Arg::INTEGER,	"Number of spaces to replace <TAB> with.", true);
-	args.add("file",	Arg::STRING,	"Filename to modify.", true, "filename");
+	args.add("spaces",	Arg::INTEGER, false, "Number of spaces to replace <TAB> with.", true);
+	args.add("file",	Arg::STRING,  false, "Filename to modify.", true, "filename");
 	
 	args.addAlias("spaces", 's');
 	args.addAlias("file", 'f');
