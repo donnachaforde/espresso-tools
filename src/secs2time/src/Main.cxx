@@ -70,8 +70,8 @@ int main(int argc, char* argv[])
 	args.addDefaults();
 
 	// specify our switches
-	args.add("date", Arg::NOARG, false, "Show date only.");
-	args.add("time", Arg::NOARG, false, "Show time only.");
+	args.add("date-only", Arg::NOARG, false, "Show date only.");
+	args.add("time-only", Arg::NOARG, false, "Show time only.");
 	args.addAlias("date", 'd');
 	args.addAlias("time", 't');
 
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
 		// convert the timestamp format
 		char szBuffer[19 + 1] = "";
-		if (args.isPresent("date") && args.isPresent("time"))
+		if (args.isPresent("date-only") && args.isPresent("time-only"))
 		{
 			::sprintf(szBuffer, "%02u:%02u:%02u %02u/%02u/%04u", UTCTime->tm_hour,
 																 UTCTime->tm_min,
@@ -154,14 +154,14 @@ int main(int argc, char* argv[])
 										   						 (UTCTime->tm_mon + 1),			// months count from 0
 																 (UTCTime->tm_year + 1900));	// years since 1900
 		}
-		else if (args.isPresent("date"))
+		else if (args.isPresent("date-only"))
 		{
 			::sprintf(szBuffer, "%02u/%02u/%04u", UTCTime->tm_mday,				
 										   		  (UTCTime->tm_mon + 1),		// months count from 0
 												  (UTCTime->tm_year + 1900));	// years since 1900
 
 		}
-		else if (args.isPresent("time"))
+		else if (args.isPresent("time-time"))
 		{
 			::sprintf(szBuffer, "%02u:%02u:%02u", UTCTime->tm_hour,
 											      UTCTime->tm_min,
