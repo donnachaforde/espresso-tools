@@ -64,111 +64,103 @@ int main(int argc, char* argv[], char* envp[])
 
 	// pick up default args/switches
 	args.addDefaults();
-	
-	args.add("delay",	  Arg::INTEGER, false, "Number of seconds to delay in between allocation increments - defaults to 1.");
+
+	args.add("exec",	  Arg::NOARG,   true,  "Execute the memory check. (Warning: This will actually allocate real memory on your system.)");
+	args.add("delay",	  Arg::INTEGER, false, "Number of seconds to delay inbetween allocation increments - defaults to 1 sec.");
 	args.add("kilobytes", Arg::NOARG,	false, "Make increments in kilobytes - default is megabytes.");
 	args.add("verbose",   Arg::NOARG,	false, "Provide detailed output, with delay in between increaments.");
 
 	args.addAlias("delay", 'd');
 	args.addAlias("kilobytes", 'k');
-	args.addAlias("spaces", 's');
-	args.addAlias("file", 'f');
 
 	// create an arg manager and parse the arg list
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (argMgr.parseAndProcessArgs(args) == -1)
+	int nRetCode = argMgr.parseAndProcessArgs(args);
+
+	if (nRetCode == -1)
 	{
 		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
 		::exit(-1);
 	}
-
-	
-	if (args.isPresent("info"))
+	else if (nRetCode == 1)
 	{
-		cout																	<< endl
-			 << args.getProgramName() << " " << args.getVersion()				<< endl 
-																				<< endl
-			 << "Compiled: " << __TIME__ << " " << __DATE__						<< endl
-
-#ifdef _DEBUG
-			 << "Mode: Debug"													<< endl
-#else
-			 << "Mode: Release"													<< endl
-#endif
-			 << "Built with the espresso library."								<< endl
-																				<< endl
-			 << args.getCopyrightNotice()										<< endl
-			 << args.getBugReportingInstructions()								<< endl;
-
+		// a provided arg has been automatically handled
 		::exit(0);
 	}
 
-
-	//
-	// examine the switches specified
-	// 
-
-	bool IsVerbose = args.isPresent("verbose");
-
-
+	
 
 	//
 	// main processing loop
 	//
 
-	// default allocation size is 1Mb
-	int nSizeofAllocUnit = (1024 * 1024);
-	string strUnit = "Mb";
+	// check args passed
+	bool isExecute = args.isPresent("exec");
+	bool isVerboseMode = args.isPresent("verbose");
+
+	if (isExecute)
+	{
+
+
+		// default allocation size is 1Mb
+		int nSizeofAllocUnit = (1024 * 1024);
+		string strUnit = "MB";
 	
-	// check if we're being asked to do it in Kb
-	if (args.isPresent("kilobytes"))
-	{
-		nSizeofAllocUnit = (1 * 1024);
-		strUnit = "Kb";
+		// check if we're being asked to do it in Kb
+		if (args.isPresent("kilobytes"))
+		{
+			nSizeofAllocUnit = (1 * 1024);
+			strUnit = "KB";
 
-	}
+		}
 
-	int iCount = 0;
-	for ( ; ; )
-	{
-		void* pv = ::malloc(nSizeofAllocUnit); 
+		int iCount = 0;
+		for ( ; ; )
+		{
+			void* pv = ::malloc(nSizeofAllocUnit); 
 
-		if (pv != NULL)
-		{	
-			iCount++;
+			if (pv != NULL)
+			{	
+				iCount++;
 
-			if (IsVerbose)
-			{
-				cout << "Allocated " << iCount << strUnit << " (of dynamic memory)." << endl;
-
-				if (args.isPresent("delay"))
+				if (isVerboseMode)
 				{
-					if (args.isValueSupplied("delay"))
+					cout << "INFO: Allocated " << iCount << strUnit << " (of dynamic memory)." << endl;
+
+					if (args.isPresent("delay"))
 					{
-						waitabit(args.getNumericValue("delay"));
-					}
-					else
-					{
-						waitabit();
+						if (args.isValueSupplied("delay"))
+						{
+							waitabit(args.getNumericValue("delay"));
+						}
+						else
+						{
+							waitabit();
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			// we've reached our limit
-			if (IsVerbose)
-			{
-				cout << "Stopped allocating memory at " << iCount << strUnit << "." << endl;
-			}
 			else
 			{
-				cout << iCount << strUnit << endl;
+				// we've reached our limit
+				if (isVerboseMode)
+				{
+					cout << "INFO: Stopped allocating memory at " << iCount << strUnit << "." << endl;
+				}
+				else
+				{
+					cout << iCount << strUnit << endl;
 
+				}
+				break; 
 			}
-			break; 
 		}
 	}
+	else
+	{
+		cout << "INFO: You need to explicitly use the --exec argument to invoke memcheck." << endl;
+	}
+
 
 	return 0; 
 }
