@@ -64,10 +64,6 @@ int main(int argc, char* argv[])
 	// pick up default args/switches
 	args.addDefaults();
 
-	// specify our switches
-//	args.Add("date", Arg::NOARG, "Show date only.");
-//	args.AddAlias("date", 'd');
-
 
 	// create argmgr to handle default switches
 	ArgManager argMgr = ArgManagerFactory::createInstance();
