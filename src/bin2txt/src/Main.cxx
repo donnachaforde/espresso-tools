@@ -91,8 +91,6 @@ int main(int argc, char* argv[], char* envp[])
 
 
 	// create argmgr to handle default switches 	
-	//StdoutArgRenderer stdoutArgRenderer; 
-	//ArgMgr argMgr(stdoutArgRenderer);
 	ArgManager argMgr = ArgManagerFactory::createInstance();
 	if (!argMgr.parseAndProcessArgs(args))
 	{
