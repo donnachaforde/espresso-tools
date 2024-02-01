@@ -38,6 +38,8 @@ static const char VERSION[] = "0.1.0-beta";
 
 
 
+
+
 /******************************************************************************\
  ******************************************************************************
  ******************************************************************************
@@ -63,6 +65,7 @@ int main(int argc, char* argv[])
 
 	// pick up default args/switches
 	args.addDefaults();
+	args.requireTarget();
 
 
 	// create argmgr to handle default switches
@@ -106,12 +109,6 @@ int main(int argc, char* argv[])
 		::sprintf(szBuffer, "%x", nDec);
 
 		cout << szBuffer << endl;
-	}
-	else
-	{
-		cout << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
 	}
 
 	return 0;

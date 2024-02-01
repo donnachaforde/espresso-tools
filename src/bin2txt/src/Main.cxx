@@ -49,7 +49,7 @@ static const char VERSION[] = "0.9.0-beta";
 
 
 // prototypes
-void ProcessFile(const Args& args);
+void execute(const Args& args);
 
 
 /******************************************************************************\
@@ -92,15 +92,19 @@ int main(int argc, char* argv[], char* envp[])
 
 	// create argmgr to handle default switches 	
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (!argMgr.parseAndProcessArgs(args))
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
 	{
-		argMgr.onRequestUsage(args);
 		::exit(0);
 	}
 
 
+	// determine if we should proceed
+	if (args.isTargetPresent() || args.isRequiredArgsPresent())
+	{
+		execute(args);
+	}
 
-	ProcessFile(args);
 
 	return 0;
 }
@@ -112,7 +116,7 @@ int main(int argc, char* argv[], char* envp[])
 
 //------------------------------------------------------------------------------
 //
-// Function       : ProcessFile
+// Function       : execute and process the file 
 //
 // Return type    : void 
 //
@@ -123,17 +127,14 @@ int main(int argc, char* argv[], char* envp[])
 // Notes          : 
 //
 //------------------------------------------------------------------------------
-void ProcessFile(const Args& args)
+void execute(const Args& args)
 {
 	//
 	// now use any args specified
 	//
 
-
-	bool IsDisplayHexOnly = args.isPresent("hex");
-	bool IsDisplayTextOnly = args.isPresent("text"); 
-
-
+	bool isDisplayHexOnly = args.isPresent("hex");
+	bool isDisplayTextOnly = args.isPresent("text"); 
 
 
 	// default to 16 wide
@@ -148,19 +149,18 @@ void ProcessFile(const Args& args)
 	FILE* fdIn = NULL;
 	if (args.isPresent("file") || args.isTargetPresent())
 	{
-		const char* szInputFilename = NULL; 
-
+		string strInputFilename;
 		if (args.isPresent("file"))
 		{
-			szInputFilename = args.getStringValue("file").c_str(); 
+			strInputFilename = args.getStringValue("file");
 		}
 		else
 		{
-			szInputFilename = args.getTarget().c_str(); 
+			strInputFilename = args.getTarget();
 		}
 
 		// check the filename
-		if (!espresso::strings::isValidString(szInputFilename))
+		if (!espresso::strings::isValidString(strInputFilename))
 		{
 			cout << "ERROR: Unable to process empty filename." << endl;
 			::exit(-1);
@@ -168,20 +168,30 @@ void ProcessFile(const Args& args)
 
 
 		// can we open the file for reading (and hence, does it even exist)...
-		int nRetCode = ::access(szInputFilename, 04);
-		if ((nRetCode == EACCES) || (nRetCode == ENOENT))
+		int nRetCode = ::access(strInputFilename.c_str(), 04);
+		if (nRetCode == EACCES)
 		{
-			cout << "ERROR: Either the file '" << szInputFilename << "' does not exist or is not available for reading purposes." << endl;
+			cout << "ERROR: Access denied. '" << strInputFilename << "' file permission doesn't allow access." << endl;
+			::exit(-1);
+		}
+		else if (nRetCode == ENOENT)
+		{
+			cout << "ERROR: File '" << strInputFilename << "' does not exist." << endl;
+			::exit(-1);
+		}
+		else if (nRetCode == EINVAL)
+		{
+			cout << "ERROR: An invalid parameter for checking access to file '" << strInputFilename << "' was provided." << endl;
 			::exit(-1);
 		}
 
 		// open the file
-		fdIn = ::fopen(szInputFilename, "rb");
+		fdIn = ::fopen(strInputFilename.c_str(), "rt");
 		assert(fdIn != NULL);
 
 		if (fdIn == NULL)
 		{
-			cout << "ERROR: Failed to open file: '" << szInputFilename << "' for reading." << endl;
+			cout << "ERROR: Failed to open file: '" << strInputFilename << "' for reading." << endl;
 			::exit(-1);
 		}
 	}
@@ -199,14 +209,14 @@ void ProcessFile(const Args& args)
 	//
 
 
-	::setvbuf(stdin, NULL, _IOLBF, 0);
-	::setvbuf(stdout, NULL, _IOLBF, 0);
+	//::setvbuf(stdin, NULL, _IOLBF, 0);
+	//::setvbuf(stdout, NULL, _IOLBF, 0);
 
 	int ch = 0;
 	int nNumColumnsShown = 0;
 
 
-	if (IsDisplayTextOnly)
+	if (isDisplayTextOnly)
 	{
 		while ((ch = ::fgetc(fdIn)) != EOF)
 		{
@@ -256,7 +266,7 @@ void ProcessFile(const Args& args)
 		while ((ch = ::fgetc(fdIn)) != EOF)
 		{
 			// build up string representation
-			if (!IsDisplayHexOnly)
+			if (!isDisplayHexOnly)
 			{
 				// if not a printable char, substitute with a dot
 				if (!isprint(ch))

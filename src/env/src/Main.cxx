@@ -27,18 +27,9 @@ static const char VERSION[] = "0.3.0-beta";
 
 
 // print list of env vars to stdout
-void displayEnvVars(char* envp[]);
+void execute(char* envp[]);
 
 
-void displayEnvVars(char* envp[])
-{
-	while (*envp != NULL)
-	{
-		cout << *envp++ << endl;
-	}
-
-	return;
-}
 
 
 
@@ -73,15 +64,24 @@ int main(int argc, char* argv[], char* envp[])
 	{
 		if (nRetCode == 0)
 		{
-			displayEnvVars(envp);
-		}
-		else if (nRetCode == -1)
-		{
-			argMgr.onRequestUsage(args);
+			execute(envp);
 		}
 	}
 
 
 
 	::exit(0);
+}
+
+
+
+// print the list of env variables to stdout
+void execute(char* envp[])
+{
+	while (*envp != NULL)
+	{
+		cout << *envp++ << endl;
+	}
+
+	return;
 }

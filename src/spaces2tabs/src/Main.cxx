@@ -48,6 +48,9 @@ using namespace std;
 static const char VERSION[] = "0.1.0-beta";
 
 
+void execute(Args& args);
+
+
 
 /******************************************************************************\
  ******************************************************************************
@@ -63,40 +66,48 @@ int main(int argc, char* argv[], char* envp[])
 	// arg parsing
 	// 
 
-	Args args(argc, 
-			  argv, 
-			  "spaces2tabs", 
-			  "Replaces spaces with tabs in text files.", 
-			  VERSION, 
-			  "Donnacha Forde", 
-			  "2006-2024", 
-			  "@DonnachaForde");
+	Args args(argc,
+		argv,
+		"spaces2tabs",
+		"Replaces spaces with tabs in text files.",
+		VERSION,
+		"Donnacha Forde",
+		"2006-2024",
+		"@DonnachaForde");
 
 	// pick up default args/switches
 	args.addDefaults();
 
 	// specify our switches & aliases
-	args.add("spaces",	Arg::INTEGER, false, "Number of spaces to replace <TAB> with.", true);
-	args.add("file",	Arg::STRING,  false, "Filename to modify.", true, "filename");
-	
+	args.add("spaces", Arg::INTEGER, false, "Number of spaces to replace <TAB> with.", true);
+	args.add("file", Arg::STRING, true, "Filename to modify.", true, "filename");
+
 	args.addAlias("spaces", 's');
 	args.addAlias("file", 'f');
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (argMgr.parseAndProcessArgs(args) == -1)
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
 	{
-		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
-		::exit(-1);
+		::exit(0);
+	}
+
+	if (args.isTargetPresent() || args.isRequiredArgsPresent())
+	{
+		execute(args);
 	}
 
 
+	return 0;
+
+}
 
 
-	//
-	// now use any args specified
-	//
 
+void execute(Args& args)
+{
+	// use any args specified
 	int nNumSpacesToReplace = 4;
 	if (args.isPresent("spaces"))
 	{
@@ -112,19 +123,18 @@ int main(int argc, char* argv[], char* envp[])
 		// open the input file
 		//
 		
-		const char* szInputFilename = NULL; 
-
+		string strInputFilename;
 		if (args.isPresent("file"))
 		{
-			szInputFilename = args.getStringValue("file").c_str(); 
+			strInputFilename = args.getStringValue("file");
 		}
 		else
 		{
-			szInputFilename = args.getTarget().c_str(); 
+			strInputFilename = args.getTarget(); 
 		}
 
 		// check the filename
-		if (!espresso::strings::isValidString(szInputFilename))
+		if (!espresso::strings::isValidString(strInputFilename))
 		{
 			cout << "ERROR: Unable to process empty filename." << endl;
 			::exit(-1);
@@ -132,20 +142,30 @@ int main(int argc, char* argv[], char* envp[])
 
 
 		// can we open the file for reading (and hence, does it even exist)...
-		int nRetCode = ::access(szInputFilename, 04);
-		if ((nRetCode == EACCES) || (nRetCode == ENOENT))
+		int nRetCode = ::access(strInputFilename.c_str(), 04);
+		if (nRetCode == EACCES)
 		{
-			cout << "ERROR: Either the file '" << szInputFilename << "' does not exist or is not available for reading purposes." << endl;
+			cout << "ERROR: Access denied. '" << strInputFilename << "' file permission doesn't allow access." << endl;
+			::exit(-1);
+		}
+		else if (nRetCode == ENOENT)
+		{
+			cout << "ERROR: File '" << strInputFilename << "' does not exist." << endl;
+			::exit(-1);
+		}
+		else if (nRetCode == EINVAL)
+		{
+			cout << "ERROR: An invalid parameter for checking access to file '" << strInputFilename << "' was provided." << endl;
 			::exit(-1);
 		}
 
 		// open the file
-		fdIn = ::fopen(szInputFilename, "rt");
+		fdIn = ::fopen(strInputFilename.c_str(), "rt");
 		assert(fdIn != NULL);
 
 		if (fdIn == NULL)
 		{
-			cout << "ERROR: Failed to open file: '" << szInputFilename << "' for reading." << endl;
+			cout << "ERROR: Failed to open file: '" << strInputFilename << "' for reading." << endl;
 			::exit(-1);
 		}
 	}
@@ -156,15 +176,13 @@ int main(int argc, char* argv[], char* envp[])
 	}
 
 
-
-
 	//
 	// main processing loop
 	//
 
 
-	::setvbuf(stdin, NULL, _IOLBF, 0);
-	::setvbuf(stdout, NULL, _IOLBF, 0);
+	//::setvbuf(stdin, NULL, _IOLBF, 0);
+	//::setvbuf(stdout, NULL, _IOLBF, 0);
 
 	int ch = 0;
 	int nNumSpacesRead = 0;
@@ -207,7 +225,7 @@ int main(int argc, char* argv[], char* envp[])
 	::fclose(fdIn);
 	::fclose(stdout);
 
-	return 0;
+	return;
 }
 
 

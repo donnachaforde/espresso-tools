@@ -36,7 +36,7 @@ static const char VERSION[] = "0.1.0-beta";
 
 
 void waitabit(unsigned int ui = 1);
-
+void execute(Args& args);
 
 
 /******************************************************************************\
@@ -53,54 +53,54 @@ int main(int argc, char* argv[], char* envp[])
 	// arg parsing
 	// 
 
-	Args args(argc, 
-			  argv, 
-			  "memcheck", 
-			  "Checks how much heap memory a process can allocate.", 
-			  VERSION, 
-			  "Donnacha Forde", 
-			  "2005-2024", 
-			  "@DonnachaForde");
+	Args args(argc,
+		argv,
+		"memcheck",
+		"Checks how much heap memory a process can allocate.",
+		VERSION,
+		"Donnacha Forde",
+		"2005-2024",
+		"@DonnachaForde");
 
 	// pick up default args/switches
 	args.addDefaults();
 
-	args.add("exec",	  Arg::NOARG,   true,  "Execute the memory check. (Warning: This will actually allocate real memory on your system.)");
-	args.add("delay",	  Arg::INTEGER, false, "Number of seconds to delay inbetween allocation increments - defaults to 1 sec.");
-	args.add("kilobytes", Arg::NOARG,	false, "Make increments in kilobytes - default is megabytes.");
-	args.add("verbose",   Arg::NOARG,	false, "Provide detailed output, with delay in between increaments.");
+	args.add("exec", Arg::NOARG, true, "Execute the memory check. (Warning: This will actually allocate real memory on your system.)");
+	args.add("delay", Arg::INTEGER, false, "Number of seconds to delay inbetween allocation increments - defaults to 1 sec.");
+	args.add("kilobytes", Arg::NOARG, false, "Make increments in kilobytes - default is megabytes.");
+	args.add("verbose", Arg::NOARG, false, "Provide detailed output, with delay in between increaments.");
 
 	args.addAlias("delay", 'd');
 	args.addAlias("kilobytes", 'k');
 
 	// create an arg manager and parse the arg list
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	int nRetCode = argMgr.parseAndProcessArgs(args);
-
-	if (nRetCode == -1)
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
 	{
-		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
-		::exit(-1);
-	}
-	else if (nRetCode == 1)
-	{
-		// a provided arg has been automatically handled
 		::exit(0);
 	}
 
-	
+	if (args.isTargetPresent() || args.isRequiredArgsPresent())
+	{
+		execute(args);
+	}
 
+	return 0;
+}
+
+void execute(Args& args)
+{
 	//
 	// main processing loop
 	//
 
 	// check args passed
-	bool isExecute = args.isPresent("exec");
 	bool isVerboseMode = args.isPresent("verbose");
 
-	if (isExecute)
+	if (args.isPresent("exec"))
 	{
-
+		cout << "INFO: Running..." << endl;
 
 		// default allocation size is 1Mb
 		int nSizeofAllocUnit = (1024 * 1024);
@@ -155,6 +155,9 @@ int main(int argc, char* argv[], char* envp[])
 				break; 
 			}
 		}
+
+		cout << "INFO: Done." << endl;
+
 	}
 	else
 	{
@@ -162,7 +165,7 @@ int main(int argc, char* argv[], char* envp[])
 	}
 
 
-	return 0; 
+	return; 
 }
 
 

@@ -19,8 +19,8 @@
 	#pragma message("note : CRT security warning (so we can use ol' fashioned 'C' calls)")
 	#define _CRT_SECURE_NO_WARNINGS
 
-//	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
-//	#pragma warning(disable : 4996)
+	#pragma message("note : Suppress warnings about deprecated POSIX function names.")
+	#pragma warning(disable : 4996)
 #endif
 
 
@@ -36,6 +36,11 @@ using namespace espresso;
 #include <iostream>
 using namespace std;
 
+#ifdef WIN32
+	#include <io.h>
+#else
+	#include <unistd.h>
+#endif
 
 // windows
 #include <Windows.h>
@@ -55,11 +60,11 @@ struct ProcessInfo
 };
 
 
-// declaration
+// declarations
 void execAndMonitorProcess(const char* szCommand, /*inout*/ ProcessInfo& processInfo); 
-void extractTargetCommand(int argc, char** argv, /*inout*/ char* szTargetCommand);
 void reportTerminationToUI(const ProcessInfo processInfo);
 
+void execute(Args& args);
 
 
 /******************************************************************************\
@@ -76,140 +81,118 @@ int main(int argc, char* argv[], char* envp[])
 	// arg parsing
 	// 
 
-	Args args(	argc,
-				argv,
-				"watch",
-				"Monitors the process you provides and reports when it terminates.",
-				VERSION,
-				"Donnacha Forde",
-				"2021-2024",
-				"@DonnachaForde");
+	Args args(argc,
+		argv,
+		"watch",
+		"Monitors the process you provides and reports when it terminates.",
+		VERSION,
+		"Donnacha Forde",
+		"2021-2024",
+		"@DonnachaForde");
 
 	// pick up default args/switches
 	args.addDefaults();
 
-	args.add("exec",	Arg::STRING,  false, "The command to execute and monitor.", true);
-	args.add("forever", Arg::NOARG,   false, "Will keep restarting the command should it terminate.", false);
-	args.add("silent",	Arg::NOARG,   false, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
-	args.add("limit",	Arg::INTEGER, false, "Used in conjuction with --forever to set a limit on the number of restarts.", true);
+	args.add("exec", Arg::STRING, true, "The command to execute and monitor.", true);
+	args.add("forever", Arg::NOARG, false, "Will keep restarting the command should it terminate.", false);
+	args.add("silent", Arg::NOARG, false, "Do not report terminations to the user. Used in conjunction with --forever to keep restarting the command.", false);
+	args.add("limit", Arg::INTEGER, false, "Used in conjuction with --forever to set a limit on the number of restarts.", true);
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
 	int nRetCode = argMgr.parseAndProcessArgs(args);
-
-	// proceed if a default switch hasn't been triggered
-	if (nRetCode != 1)
+	if (nRetCode != 0)
 	{
-		// check we have required arg
-		if (!args.isPresent("exec"))
-		{
-			argMgr.onRequestUsage(args);
-			::exit(-1);
-		}
-
-		if (args.isPresent("limit") && !args.isPresent("forever"))
-		{
-			cout << "ERROR: Cannot specify --limit without also specifying --forever option." << endl;
-			::exit(-1);
-		}
-
-		/*
-		if (!args.isTargetPresent("limit"))
-		{
-			cout << "ERROR: You must specify a value with the --limit option." << endl;
-			::exit(-1);
-		}
-		*/
-
-
-		// unless a limit has been specified, this is enough to keep it going
-		long nRestartLimit = 1;
-		if (args.isPresent("limit"))
-		{
-			nRestartLimit = args.getNumericValue("limit");
-			if (nRestartLimit <= 0)
-			{
-				cout << "ERROR: The --limit value must be > 0." << endl;
-				::exit(-1);
-			}
-		}
-
-
-		// extract the target command from argv
-		char szTargetCommand[256] = "";
-		extractTargetCommand(argc, argv, szTargetCommand);
-		assert(strings::isValidString(szTargetCommand));
-
-
-		//
-		// kick off and watch child process
-		//
-
-		do
-		{
-			ProcessInfo processInfo;
-			execAndMonitorProcess(szTargetCommand, processInfo);
-
-			if (!args.isPresent("silent"))
-			{
-				reportTerminationToUI(processInfo);
-			}
-
-			// decrement our limit counter
-			if (args.isPresent("limit"))
-			{
-				nRestartLimit--;
-			}
-
-		} while (args.isPresent("forever") && (nRestartLimit > 0));
+		::exit(0);
 	}
-	
+
+
+	if (args.isPresent("limit") && !args.isPresent("forever"))
+	{
+		cout << "ERROR: Cannot specify --limit without also specifying --forever option." << endl;
+		::exit(-1);
+	}
+
+	if (args.isTargetPresent() || args.isRequiredArgsPresent())
+	{
+		execute(args);
+	}
+
 	::exit(0);
 }
 
-
-void extractTargetCommand(int argc, char** argv, /*inout*/ char* szTargetCommand)
+void execute(Args & args)
 {
-	//
-	// everything after the --exec switch is the command (and args) we need to execute
-	//
-
-	// search for '--exec' in the arg list
-	int iIndex = 1;
-	bool isFound = false;
-	while (!isFound && iIndex < argc)
+	// unless a limit has been specified, this is enough to keep it going
+	long nRestartLimit = 1;
+	if (args.isPresent("limit"))
 	{
-		if (::strcmp(argv[iIndex], "--exec") == 0)
+		nRestartLimit = args.getNumericValue("limit");
+		if (nRestartLimit <= 0)
 		{
-			isFound = true;
-
-			// bump the index so we refer to the command after the --exec switch
-			iIndex++;
-		}
-		else
-		{
-			iIndex++;
+			cout << "ERROR: The --limit value must be > 0." << endl;
+			::exit(-1);
 		}
 	}
 
-	// target command is everything after --exec - 	create the command string from the rest of the args
-	assert(isFound);
-	if (isFound)
-	{
-		for (int i = iIndex; i < argc; i++)
-		{
-			::strcat(szTargetCommand, argv[i]);
 
-			// if we have more args, add a space
-			if ((i + 1) < argc)
-			{
-				::strcat(szTargetCommand, " ");
-			}
+	// extract the target command
+	char szTargetCommand[256] = "";
+	::strcpy(szTargetCommand, args.getStringValue("exec").c_str());
+	assert(strings::isValidString(szTargetCommand));
+
+	// check that the executable file actually exists
+	int nRetCode = ::access(szTargetCommand, 00);
+	if (nRetCode != 0)
+	{
+		if (nRetCode == EACCES)
+		{
+			cout << "ERROR: Unable to access '" << szTargetCommand << "' (file permissions)." << endl;
 		}
+		else if (nRetCode == ENOENT)
+		{
+			cout << "ERROR: Executable file '" << szTargetCommand << "' does not exist." << endl;
+		}
+		else if (nRetCode == EINVAL)
+		{
+			cout << "ERROR: An invalid parameter for checking access to file '" << szTargetCommand << "' was provided." << endl;
+		}
+		else if (nRetCode == -1)
+		{
+			cout << "ERROR: Executable file '" << szTargetCommand << "' does not exist." << endl;
+		}
+
+		::exit(-1);
 	}
+
+
+	//
+	// kick off and watch child process
+	//
+
+	do
+	{
+		ProcessInfo processInfo;
+		execAndMonitorProcess(szTargetCommand, processInfo);
+
+		if (!args.isPresent("silent"))
+		{
+			reportTerminationToUI(processInfo);
+		}
+
+		// decrement our limit counter
+		if (args.isPresent("limit"))
+		{
+			nRestartLimit--;
+		}
+
+	} while (args.isPresent("forever") && (nRestartLimit > 0));
+
 
 	return;
 }
+
+
 
 
 void execAndMonitorProcess(const char* szCommand, /*inout*/ ProcessInfo& processInfo)

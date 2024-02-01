@@ -68,48 +68,19 @@ int main(int argc, char* argv[])
 
 	// pick up default args/switches
 	args.addDefaults();
+	args.requireTarget();
 
 	// specify our switches
 	args.add("date-only", Arg::NOARG, false, "Show date only.");
 	args.add("time-only", Arg::NOARG, false, "Show time only.");
-	args.addAlias("date", 'd');
-	args.addAlias("time", 't');
+	args.addAlias("date-only", 'd');
+	args.addAlias("time-only", 't');
 
 	// create an arg manager to parse the args
 	ArgManager argMgr = ArgManagerFactory::createInstance();
-	if (argMgr.parseAndProcessArgs(args) == -1)
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
 	{
-		cout << "ERROR: Invalid option: '" << args.getInvalidOption() << "'. Use --help for option information." << endl;
-		::exit(-1);
-	}
-
-
-	// check for requests for help, usage and version
-	if (args.isPresent("help") || args.isPresent('h') || args.isPresent('?'))
-	{
-		cout															<< endl
-			 << args.getProgramDescription()							<< endl
-																		<< endl 
-			 << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getOptionsDescriptions()							<< endl
-																		<< endl
-			 << args.getCopyrightNotice()								<< endl
-			 << args.getBugReportingInstructions()						<< endl;
-
-		::exit(0);
-	}
-	else if (args.isPresent("usage"))
-	{
-		cout << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
-		::exit(0);
-	}
-	else if (args.isPresent("version"))
-	{
-		cout << args.getProgramName() << " " << args.getVersion()		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
 		::exit(0);
 	}
 
@@ -179,12 +150,7 @@ int main(int argc, char* argv[])
 
 		cout << szBuffer << endl;
 	}
-	else
-	{
-		cout << args.getUsage()											<< endl
-																		<< endl 
-			 << args.getCopyrightNotice()								<< endl;
-	}
+
 
 	return 0;
 }
