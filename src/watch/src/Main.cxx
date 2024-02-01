@@ -47,7 +47,7 @@ using namespace std;
 
 
 // version number
-static const char VERSION[] = "0.2.0-beta";
+static const char VERSION[] = "0.10.0-beta";
 
 
 
@@ -84,7 +84,7 @@ int main(int argc, char* argv[], char* envp[])
 	Args args(argc,
 		argv,
 		"watch",
-		"Monitors the process you provides and reports when it terminates.",
+		"Starts and monitors the command you provide and reports when it terminates.",
 		VERSION,
 		"Donnacha Forde",
 		"2021-2024",

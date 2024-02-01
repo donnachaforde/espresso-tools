@@ -46,7 +46,7 @@ using namespace std;
 #endif
 
 // version number
-static const char VERSION[] = "0.1.0-beta";
+static const char VERSION[] = "0.10.0-beta";
 
 void execute(Args& args);
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[], char* envp[])
 
 	// specify our switches & aliases
 	args.add("spaces", Arg::INTEGER, false, "Number of spaces to replace <TAB> with. (Default=4)", true);
-	args.add("file", Arg::STRING, false, "Filename to modify.", true, "filename");
+	args.add("file", Arg::STRING, true, "Filename to modify.", true, "filename");
 
 	args.addAlias("spaces", 's');
 	args.addAlias("file", 'f');
