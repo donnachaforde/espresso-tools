@@ -31,7 +31,7 @@
 *.positions
 *.plg
 *.suo
-*.vcproj
+# *.vcproj
 *.vcxproj.user
 # *.vcxproj.filters
 *.VC.db
