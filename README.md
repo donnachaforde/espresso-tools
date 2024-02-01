@@ -17,12 +17,12 @@ Here's what's included in the repo:
 | ------------- |-------------| -----|
 | bin2txt	    | writes binary file to stdout as text ||
 | dec2hex		| writes a decimal integer to stdout in its raw hex equivalent format||
-| env         	| same as Unix env ||
+| cores			| Reports the number of logical cores on the host (under development) | Windows|| env         	| same as Unix env ||
 | memcheck    	| checks how much heap memory can be allocated by a process (by actually trying to allocate it, quickly or slowly if required). ||
 | secs2time   	| write a timestamp in seconds to stdout as 'human-readable' date and time (in the format HH:MM:SS DD/MM/YYYY)||
 | spaces2tabs 	| writes file text file to stdout, converting spaces to tabs	||
 | tabs2spaces 	| writes file text file to stdout, converting tabs to spaces	||
-| watch			| kicks off and monitors the specified processes, reporting when terminated	| Windows only|
+| watch			| kicks off and monitors the specified processes, reporting when terminated	| Windows|
 
 
 
