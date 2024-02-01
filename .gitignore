@@ -33,7 +33,7 @@
 *.suo
 *.vcproj
 *.vcxproj.user
-*.vcxproj.filters
+# *.vcxproj.filters
 *.VC.db
 *.VC.VC.opendb
 .vs

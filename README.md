@@ -15,7 +15,7 @@ Here's what's included in the repo:
 
 | Utility        | Desciption           | Platforms  |
 | ------------- |-------------| -----|
-| bin2txt	| writes binary file to stdout as text ||
+| bin2txt	    | writes binary file to stdout as text ||
 | dec2hex		| writes a decimal integer to stdout in its raw hex equivalent format||
 | env         	| same as Unix env ||
 | memcheck    	| checks how much heap memory can be allocated by a process (by actually trying to allocate it, quickly or slowly if required). ||

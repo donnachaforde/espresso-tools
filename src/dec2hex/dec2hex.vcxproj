@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{53081fc8-721b-430b-b5a4-945d38d11fdd}</ProjectGuid>
-    <RootNamespace>tabs2spaces</RootNamespace>
+    <ProjectGuid>{9df92955-fd81-42ba-954c-72d713a35fe3}</ProjectGuid>
+    <RootNamespace>dec2hex</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -148,9 +148,6 @@
       <AdditionalDependencies>libespresso.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="makefile" />
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cxx" />
   </ItemGroup>
