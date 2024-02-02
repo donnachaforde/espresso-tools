@@ -13,17 +13,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <sys/mkdev.h>
-//#include <dirent.h>
-//#include <fstream.h>		// ifstream, iostream
-
+// c++rt
 #include <iostream>
+//#include <filesystem>
 using namespace std; 
 
-//#include <winbase.h>
+// windows
 #include <windows.h>
 
 // espresso lib
@@ -41,12 +36,16 @@ struct DirectoryCounter
 {
 	int nNumFiles;
 	int nNumDirs;
+	int nNumWordDocs;
+	int nNumSpreadsheets;
+	int nNumTextFiles;
 };
 
 
 
 void execute(Args& args);
 void parseDirectory(const wstring& szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount);
+void checkFileType(const wstring& wstrFilename, DirectoryCounter& dirCounter);
 
 
 /******************************************************************************\
@@ -78,6 +77,7 @@ int main(int argc, char* argv[], char* envp[])
 
 	// specify our switches & aliases
 	args.add("verbose", Arg::NOARG, false, "Display directory details to stdout.", false);
+	args.add("detail", Arg::NOARG, false, "Displays number of certain file types.", false);
 
 
 	// create an arg manager to parse the args
@@ -108,20 +108,28 @@ void execute(Args& args)
 		::exit(-1);
 	}
 
-
-	// check if we should print details
-	bool isVerbose = args.isPresent("verbose");
-
-	// initialize counter
+	// initialize counters
 	DirectoryCounter dirCounter;
 	dirCounter.nNumDirs = 0; 
 	dirCounter.nNumFiles = 0;
+	dirCounter.nNumWordDocs = 0;
+	dirCounter.nNumSpreadsheets = 0;
+	dirCounter.nNumTextFiles = 0;
 
 	// convert string to WIN32 friendly format
 	wstring wstrDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
 	parseDirectory(wstrDirectoryName, args.isPresent("verbose"), dirCounter);
 
+	// write out results
 	cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
+
+	// if asked, provide details
+	if (args.isPresent("detail"))
+	{
+		cout << dirCounter.nNumWordDocs << " Word docs"				<< endl
+			 << dirCounter.nNumSpreadsheets << " Spreadsheets"		<< endl
+			 << dirCounter.nNumTextFiles << " Text files"			<< endl;
+	}
 
 	return;
 }
@@ -171,6 +179,7 @@ void parseDirectory(const wstring& wstrDirectoryName, bool isVerbose, DirectoryC
 			else 
 			{
 				dirCounter.nNumFiles++;
+				checkFileType(wstrPathName, dirCounter);
 
 				if (isVerbose)
 				{
@@ -187,6 +196,34 @@ void parseDirectory(const wstring& wstrDirectoryName, bool isVerbose, DirectoryC
 }
 
 
+void checkFileType(const wstring& wstrFilename, DirectoryCounter& dirCounter)
+{
+	// determine the file extension
+	wstring extn; 
+	size_t dot = wstrFilename.find_last_of(L".");
+	if (dot != string::npos)
+	{
+		extn = wstrFilename.substr(dot, (wstrFilename.size() - dot));
+	}
+
+	if (!extn.empty())
+	{
+		if (extn == L".xlsx")
+		{
+			dirCounter.nNumSpreadsheets++;
+		}
+		else if (extn == L".docx")
+		{
+			dirCounter.nNumWordDocs++;
+		}
+		else if (extn == L".txt")
+		{
+			dirCounter.nNumTextFiles++;
+		}
+	}
+
+	return;
+}
 
 
 
