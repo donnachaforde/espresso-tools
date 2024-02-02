@@ -46,7 +46,7 @@ struct DirectoryCounter
 
 
 void execute(Args& args);
-void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount);
+void parseDirectory(const wstring& szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount);
 
 
 /******************************************************************************\
@@ -109,17 +109,17 @@ void execute(Args& args)
 	}
 
 
-	bool isVerbose = args.isPresent("versbose");
+	// check if we should print details
+	bool isVerbose = args.isPresent("verbose");
 
-
-
+	// initialize counter
 	DirectoryCounter dirCounter;
 	dirCounter.nNumDirs = 0; 
 	dirCounter.nNumFiles = 0;
 
 	// convert string to WIN32 friendly format
-	wstring strwDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
-	parseDirectory(strwDirectoryName.c_str(), isVerbose, dirCounter);
+	wstring wstrDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
+	parseDirectory(wstrDirectoryName, args.isPresent("verbose"), dirCounter);
 
 	cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
 
@@ -129,10 +129,10 @@ void execute(Args& args)
 
 
 
-void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount)
+void parseDirectory(const wstring& wstrDirectoryName, bool isVerbose, DirectoryCounter& dirCounter)
 {
-	// need to add wildchar 
-	wstring strwDirectoryPath = szwDirectoryName;
+	// need to add wildchar for call to FindFirstFile
+	wstring strwDirectoryPath = wstrDirectoryName;
 	strwDirectoryPath += L"\\*";
 	
 	HANDLE hFind;
@@ -143,32 +143,39 @@ void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCo
 	{
 		do
 		{
-
-			wstring strwPath = szwDirectoryName;
-			strwPath += L"\\";
-			strwPath += findData.cFileName;
+			// construct full path name
+			wstring wstrPathName = wstrDirectoryName;
+			wstrPathName += L"\\";
+			wstrPathName += findData.cFileName;
 
 			// check for directories
 			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				::wprintf(L"<DIR>  %s\n", strwPath.c_str());
+				if (isVerbose)
+				{
+					::wprintf(L"<DIR>  %s\n", wstrPathName.c_str());
+				}
 
 				// skip self and parent dirs - i.e. '.' and '..'
 				if (::wcscmp(L".", findData.cFileName) != 0 && ::wcscmp(L"..", findData.cFileName) != 0)
 				{
-					dirCount.nNumDirs++;
+					dirCounter.nNumDirs++;
 
 					// parse subdirectory - recursively
-					wstring strwSubDirectory = szwDirectoryName;
-					strwSubDirectory += L"\\";
-					strwSubDirectory += findData.cFileName;
-					parseDirectory(strwSubDirectory.c_str(), isVerbose, dirCount);
+					wstring wstrSubDirectoryName = wstrDirectoryName;
+					wstrSubDirectoryName += L"\\";
+					wstrSubDirectoryName += findData.cFileName;
+					parseDirectory(wstrSubDirectoryName, isVerbose, dirCounter);
 				}
 			}
 			else 
 			{
-				dirCount.nNumFiles++;
-				::wprintf(L"<FILE> %s\n", findData.cFileName);
+				dirCounter.nNumFiles++;
+
+				if (isVerbose)
+				{
+					::wprintf(L"<FILE> %s\n", wstrPathName.c_str());
+				}
 			}
 
 		} while (::FindNextFile(hFind, &findData));
@@ -178,6 +185,8 @@ void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCo
 
 	return;
 }
+
+
 
 
 
