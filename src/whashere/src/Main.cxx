@@ -36,12 +36,17 @@ using namespace espresso;
 static const char VERSION[] = "0.11.0-beta";
 
 
+// shared struct
+struct DirectoryCounter
+{
+	int nNumFiles;
+	int nNumDirs;
+};
+
 
 
 void execute(Args& args);
-void parseDirectory(LPCWSTR szDirectoryName);
-
-
+void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount);
 
 
 /******************************************************************************\
@@ -103,20 +108,28 @@ void execute(Args& args)
 		::exit(-1);
 	}
 
-	//parseDirectory(L"D:/tmp");
-	//parseDirectory(szwDirectory);
+
+	bool isVerbose = args.isPresent("versbose");
+
+
+
+	DirectoryCounter dirCounter;
+	dirCounter.nNumDirs = 0; 
+	dirCounter.nNumFiles = 0;
 
 	// convert string to WIN32 friendly format
 	wstring strwDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
-	//strwDirectoryName += L"\\*";
-	parseDirectory(strwDirectoryName.c_str());
+	parseDirectory(strwDirectoryName.c_str(), isVerbose, dirCounter);
 
+	cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
+
+	return;
 }
 
 
 
 
-void parseDirectory(const wchar_t* szwDirectoryName)
+void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount)
 {
 	// need to add wildchar 
 	wstring strwDirectoryPath = szwDirectoryName;
@@ -130,24 +143,38 @@ void parseDirectory(const wchar_t* szwDirectoryName)
 	{
 		do
 		{
+			wstring strwFileObject = findData.cFileName;
+
 			// check for directories
 			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				::wprintf(L"<DIR> %s\n", findData.cFileName);
+				//::wprintf(L"<DIR>  %s\n", findData.cFileName);
+				wstring strwPath = szwDirectoryName;
+				strwPath += L"\\";
+				strwPath += findData.cFileName;
+				::wprintf(L"<DIR>  %s\n", strwPath.c_str());
+
 
 				// skip self and parent dirs - i.e. '.' and '..'
 				if (::wcscmp(L".", findData.cFileName) != 0 && ::wcscmp(L"..", findData.cFileName) != 0)
 				{
-					wchar_t szwSubDirectory[MAX_PATH];
-					::wcscpy_s(szwSubDirectory, szwDirectoryName);
-					::wcscat_s(szwSubDirectory, L"\\");
-					::wcscat_s(szwSubDirectory, findData.cFileName);
+					dirCount.nNumDirs++;
+					//wchar_t szwSubDirectory[MAX_PATH];
+					//::wcscpy_s(szwSubDirectory, szwDirectoryName);
+					//::wcscat_s(szwSubDirectory, L"\\");
+					//::wcscat_s(szwSubDirectory, findData.cFileName);
 
-					parseDirectory(szwSubDirectory);
+					wstring strwSubDirectory = szwDirectoryName;
+					strwSubDirectory += L"\\";
+					strwSubDirectory += findData.cFileName;
+
+					//parseDirectory(szwSubDirectory, isVerbose);
+					parseDirectory(strwSubDirectory.c_str(), isVerbose, dirCount);
 				}
 			}
-			else
+			else 
 			{
+				dirCount.nNumFiles++;
 				::wprintf(L"<FILE> %s\n", findData.cFileName);
 			}
 
@@ -156,50 +183,8 @@ void parseDirectory(const wchar_t* szwDirectoryName)
 		::FindClose(hFind);
 	}
 
+	return;
 }
 
 
-
-
-void parseDirectoryOld(LPCWSTR szDirectoryName)
-{
-	wchar_t szwDirectory[MAX_PATH];
-	::wcscpy_s(szwDirectory, szDirectoryName);
-	::wcscat_s(szwDirectory, L"\\*");
-
-
-	// prep dir name for processing with FindFirstFile
-	HANDLE hFind;
-	WIN32_FIND_DATA findData;
-	hFind = ::FindFirstFile(szwDirectory, &findData);
-	if (hFind != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{
-				::wprintf(L"<DIR> %s\n", findData.cFileName);
-
-				// skip self and parent dirs
-				if (wcscmp(L".", findData.cFileName) != 0 && wcscmp(L"..", findData.cFileName) != 0)
-				{
-					wchar_t szwSubDirectory[MAX_PATH];
-					::wcscpy_s(szwSubDirectory, szwDirectory);
-					::wcscat_s(szwSubDirectory, L"\\");
-					::wcscat_s(szwSubDirectory, findData.cFileName);
-
-					parseDirectory(szwSubDirectory);
-				}
-			}
-			else
-			{
-				::wprintf(L"<FILE> %s\n", findData.cFileName);
-			}
-
-		} while (::FindNextFile(hFind, &findData));
-
-		::FindClose(hFind);
-	}
-
-}
 
