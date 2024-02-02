@@ -109,21 +109,60 @@ void execute(Args& args)
 
 	// convert string to WIN32 friendly format
 	wstring strwDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
-	//wchar_t szwDirectory[MAX_PATH];
-	//::wcscpy_s(szwDirectory, strwDirectoryName.c_str());
-	//::wcscat_s(szwDirectory, L"\\*");
-
+	//strwDirectoryName += L"\\*";
 	parseDirectory(strwDirectoryName.c_str());
-
-
 
 }
 
 
 
 
+void parseDirectory(const wchar_t* szwDirectoryName)
+{
+	// need to add wildchar 
+	wstring strwDirectoryPath = szwDirectoryName;
+	strwDirectoryPath += L"\\*";
+	
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	hFind = ::FindFirstFile(strwDirectoryPath.c_str(), &findData);
 
-void parseDirectory(LPCWSTR szDirectoryName)
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			// check for directories
+			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				::wprintf(L"<DIR> %s\n", findData.cFileName);
+
+				// skip self and parent dirs - i.e. '.' and '..'
+				if (::wcscmp(L".", findData.cFileName) != 0 && ::wcscmp(L"..", findData.cFileName) != 0)
+				{
+					wchar_t szwSubDirectory[MAX_PATH];
+					::wcscpy_s(szwSubDirectory, szwDirectoryName);
+					::wcscat_s(szwSubDirectory, L"\\");
+					::wcscat_s(szwSubDirectory, findData.cFileName);
+
+					parseDirectory(szwSubDirectory);
+				}
+			}
+			else
+			{
+				::wprintf(L"<FILE> %s\n", findData.cFileName);
+			}
+
+		} while (::FindNextFile(hFind, &findData));
+
+		::FindClose(hFind);
+	}
+
+}
+
+
+
+
+void parseDirectoryOld(LPCWSTR szDirectoryName)
 {
 	wchar_t szwDirectory[MAX_PATH];
 	::wcscpy_s(szwDirectory, szDirectoryName);
