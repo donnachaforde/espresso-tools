@@ -40,7 +40,6 @@ static const char VERSION[] = "0.11.0-beta";
 
 void execute(Args& args);
 void parseDirectory(LPCWSTR szDirectoryName);
-//bool isDirectory(const char* szDirectoryName);
 
 
 
@@ -204,10 +203,3 @@ void parseDirectoryOld(LPCWSTR szDirectoryName)
 
 }
 
-//bool isDirectory(const char* szDirectoryName)
-//{
-//	struct stat directoryInfo;
-//	::stat(szDirectoryName, &directoryInfo);
-//
-//	return S_ISDIR(directoryInfo.st_mode);
-//}
