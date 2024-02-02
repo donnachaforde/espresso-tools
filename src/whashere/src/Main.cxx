@@ -143,32 +143,25 @@ void parseDirectory(const wchar_t* szwDirectoryName, bool isVerbose, DirectoryCo
 	{
 		do
 		{
-			wstring strwFileObject = findData.cFileName;
+
+			wstring strwPath = szwDirectoryName;
+			strwPath += L"\\";
+			strwPath += findData.cFileName;
 
 			// check for directories
 			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				//::wprintf(L"<DIR>  %s\n", findData.cFileName);
-				wstring strwPath = szwDirectoryName;
-				strwPath += L"\\";
-				strwPath += findData.cFileName;
 				::wprintf(L"<DIR>  %s\n", strwPath.c_str());
-
 
 				// skip self and parent dirs - i.e. '.' and '..'
 				if (::wcscmp(L".", findData.cFileName) != 0 && ::wcscmp(L"..", findData.cFileName) != 0)
 				{
 					dirCount.nNumDirs++;
-					//wchar_t szwSubDirectory[MAX_PATH];
-					//::wcscpy_s(szwSubDirectory, szwDirectoryName);
-					//::wcscat_s(szwSubDirectory, L"\\");
-					//::wcscat_s(szwSubDirectory, findData.cFileName);
 
+					// parse subdirectory - recursively
 					wstring strwSubDirectory = szwDirectoryName;
 					strwSubDirectory += L"\\";
 					strwSubDirectory += findData.cFileName;
-
-					//parseDirectory(szwSubDirectory, isVerbose);
 					parseDirectory(strwSubDirectory.c_str(), isVerbose, dirCount);
 				}
 			}
