@@ -26,34 +26,117 @@ using namespace std;
 //#include <winbase.h>
 #include <windows.h>
 
+// espresso lib
+#include <espresso.hxx>
+using namespace espresso;
+
+
+
 // version number
-static const char VERSION[] = "0.3.0-beta";
+static const char VERSION[] = "0.11.0-beta";
 
 
 
-//bool isDirectory(const char* szDirectoryName)
-//{
-//	struct stat directoryInfo;
-//	::stat(szDirectoryName, &directoryInfo);
-//
-//	return S_ISDIR(directoryInfo.st_mode);
-//}
+
+void execute(Args& args);
+void parseDirectory(LPCWSTR szDirectoryName);
+//bool isDirectory(const char* szDirectoryName);
+
+
+
+
+/******************************************************************************\
+ ******************************************************************************
+ ******************************************************************************
+ *********************************    MAIN    *********************************
+ ******************************************************************************
+ ******************************************************************************
+\******************************************************************************/
+
+int main(int argc, char* argv[], char* envp[])
+{
+	//
+	// arg parsing
+	// 
+
+	Args args(argc,
+		argv,
+		"whashere",
+		"Examines what elements are in the given directory.",
+		VERSION,
+		"Donnacha Forde",
+		"2023-2024",
+		"@DonnachaForde");
+
+	// pick up default args/switches
+	args.addDefaults();
+	args.requireTarget();
+
+	// specify our switches & aliases
+	args.add("verbose", Arg::NOARG, false, "Display directory details to stdout.", false);
+
+
+	// create an arg manager to parse the args
+	ArgManager argMgr = ArgManagerFactory::createInstance();
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
+	{
+		::exit(0);
+	}
+
+	if (args.isTargetPresent())
+	{
+		execute(args);
+	}
+
+
+	return 0;
+}
+
+
+void execute(Args& args)
+{
+	// get and check the target direct
+	string strTargetDirectory = args.getTarget();
+	if (!espresso::strings::isValidString(strTargetDirectory))
+	{
+		cout << "ERROR: Invalid target director." << endl;
+		::exit(-1);
+	}
+
+	//parseDirectory(L"D:/tmp");
+	//parseDirectory(szwDirectory);
+
+	// convert string to WIN32 friendly format
+	wstring strwDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
+	//wchar_t szwDirectory[MAX_PATH];
+	//::wcscpy_s(szwDirectory, strwDirectoryName.c_str());
+	//::wcscat_s(szwDirectory, L"\\*");
+
+	parseDirectory(strwDirectoryName.c_str());
+
+
+
+}
+
+
+
+
 
 void parseDirectory(LPCWSTR szDirectoryName)
 {
-	// prep dir name for processing with FindFirstFile
 	wchar_t szwDirectory[MAX_PATH];
 	::wcscpy_s(szwDirectory, szDirectoryName);
 	::wcscat_s(szwDirectory, L"\\*");
 
 
+	// prep dir name for processing with FindFirstFile
 	HANDLE hFind;
 	WIN32_FIND_DATA findData;
 	hFind = ::FindFirstFile(szwDirectory, &findData);
-
-	if (hFind != INVALID_HANDLE_VALUE) 
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
-		do 
+		do
 		{
 			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
@@ -63,7 +146,7 @@ void parseDirectory(LPCWSTR szDirectoryName)
 				if (wcscmp(L".", findData.cFileName) != 0 && wcscmp(L"..", findData.cFileName) != 0)
 				{
 					wchar_t szwSubDirectory[MAX_PATH];
-					::wcscpy_s(szwSubDirectory, szDirectoryName);
+					::wcscpy_s(szwSubDirectory, szwDirectory);
 					::wcscat_s(szwSubDirectory, L"\\");
 					::wcscat_s(szwSubDirectory, findData.cFileName);
 
@@ -75,17 +158,17 @@ void parseDirectory(LPCWSTR szDirectoryName)
 				::wprintf(L"<FILE> %s\n", findData.cFileName);
 			}
 
-		} 
-		while (::FindNextFile(hFind, &findData));
-		
+		} while (::FindNextFile(hFind, &findData));
+
 		::FindClose(hFind);
 	}
 
 }
 
-
-int main(int argc, char* argv[], char* envp[])
-{
-	cout << "whashere parsing directories..." << endl;
-	parseDirectory(L"D:/tmp");
-}
+//bool isDirectory(const char* szDirectoryName)
+//{
+//	struct stat directoryInfo;
+//	::stat(szDirectoryName, &directoryInfo);
+//
+//	return S_ISDIR(directoryInfo.st_mode);
+//}
