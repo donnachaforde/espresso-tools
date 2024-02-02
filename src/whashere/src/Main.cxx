@@ -110,7 +110,7 @@ void execute(Args& args)
 
 	// initialize counters
 	DirectoryCounter dirCounter;
-	dirCounter.nNumDirs = 0; 
+	dirCounter.nNumDirs = 0;
 	dirCounter.nNumFiles = 0;
 	dirCounter.nNumWordDocs = 0;
 	dirCounter.nNumSpreadsheets = 0;
@@ -118,17 +118,30 @@ void execute(Args& args)
 
 	// convert string to WIN32 friendly format
 	wstring wstrDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
-	parseDirectory(wstrDirectoryName, args.isPresent("verbose"), dirCounter);
 
-	// write out results
-	cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
+	// check the target directory exists
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	hFind = ::FindFirstFile(wstrDirectoryName.c_str(), &findData);
 
-	// if asked, provide details
-	if (args.isPresent("detail"))
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
-		cout << dirCounter.nNumWordDocs << " Word docs"				<< endl
-			 << dirCounter.nNumSpreadsheets << " Spreadsheets"		<< endl
-			 << dirCounter.nNumTextFiles << " Text files"			<< endl;
+		parseDirectory(wstrDirectoryName, args.isPresent("verbose"), dirCounter);
+
+		// write out results
+		cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
+
+		// if asked, provide details
+		if (args.isPresent("detail"))
+		{
+			cout << dirCounter.nNumWordDocs << " Word docs" << endl
+				<< dirCounter.nNumSpreadsheets << " Spreadsheets" << endl
+				<< dirCounter.nNumTextFiles << " Text files" << endl;
+		}
+	}
+	else
+	{
+		cout << "ERROR: Directory='" << strTargetDirectory << "' does not exist." << endl;
 	}
 
 	return;
@@ -140,12 +153,12 @@ void execute(Args& args)
 void parseDirectory(const wstring& wstrDirectoryName, bool isVerbose, DirectoryCounter& dirCounter)
 {
 	// need to add wildchar for call to FindFirstFile
-	wstring strwDirectoryPath = wstrDirectoryName;
-	strwDirectoryPath += L"\\*";
+	wstring wstrDirectoryPath = wstrDirectoryName;
+	wstrDirectoryPath += L"\\*";
 	
 	HANDLE hFind;
 	WIN32_FIND_DATA findData;
-	hFind = ::FindFirstFile(strwDirectoryPath.c_str(), &findData);
+	hFind = ::FindFirstFile(wstrDirectoryPath.c_str(), &findData);
 
 	if (hFind != INVALID_HANDLE_VALUE)
 	{
