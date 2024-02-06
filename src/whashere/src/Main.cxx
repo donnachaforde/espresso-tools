@@ -13,79 +13,230 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <sys/mkdev.h>
-//#include <dirent.h>
-//#include <fstream.h>		// ifstream, iostream
-
+// c++rt
 #include <iostream>
+//#include <filesystem>
 using namespace std; 
 
-//#include <winbase.h>
+// windows
 #include <windows.h>
 
+// espresso lib
+#include <espresso.hxx>
+using namespace espresso;
+
+
+
 // version number
-static const char VERSION[] = "0.3.0-beta";
+static const char VERSION[] = "0.11.0-beta";
 
 
-
-//bool isDirectory(const char* szDirectoryName)
-//{
-//	struct stat directoryInfo;
-//	::stat(szDirectoryName, &directoryInfo);
-//
-//	return S_ISDIR(directoryInfo.st_mode);
-//}
-
-void parseDirectory(LPCWSTR szDirectoryName)
+// shared struct
+struct DirectoryCounter
 {
-	// prep dir name for processing with FindFirstFile
-	wchar_t szwDirectory[MAX_PATH];
-	::wcscpy_s(szwDirectory, szDirectoryName);
-	::wcscat_s(szwDirectory, L"\\*");
+	int nNumFiles;
+	int nNumDirs;
+	int nNumWordDocs;
+	int nNumSpreadsheets;
+	int nNumTextFiles;
+};
 
 
-	HANDLE hFind;
-	WIN32_FIND_DATA findData;
-	hFind = ::FindFirstFile(szwDirectory, &findData);
 
-	if (hFind != INVALID_HANDLE_VALUE) 
-	{
-		do 
-		{
-			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{
-				::wprintf(L"<DIR> %s\n", findData.cFileName);
+void execute(Args& args);
+void parseDirectory(const wstring& szwDirectoryName, bool isVerbose, DirectoryCounter& dirCount);
+void checkFileType(const wstring& wstrFilename, DirectoryCounter& dirCounter);
 
-				// skip self and parent dirs
-				if (wcscmp(L".", findData.cFileName) != 0 && wcscmp(L"..", findData.cFileName) != 0)
-				{
-					wchar_t szwSubDirectory[MAX_PATH];
-					::wcscpy_s(szwSubDirectory, szDirectoryName);
-					::wcscat_s(szwSubDirectory, L"\\");
-					::wcscat_s(szwSubDirectory, findData.cFileName);
 
-					parseDirectory(szwSubDirectory);
-				}
-			}
-			else
-			{
-				::wprintf(L"<FILE> %s\n", findData.cFileName);
-			}
-
-		} 
-		while (::FindNextFile(hFind, &findData));
-		
-		::FindClose(hFind);
-	}
-
-}
-
+/******************************************************************************\
+ ******************************************************************************
+ ******************************************************************************
+ *********************************    MAIN    *********************************
+ ******************************************************************************
+ ******************************************************************************
+\******************************************************************************/
 
 int main(int argc, char* argv[], char* envp[])
 {
-	cout << "whashere parsing directories..." << endl;
-	parseDirectory(L"D:/tmp");
+	//
+	// arg parsing
+	// 
+
+	Args args(argc,
+		argv,
+		"whashere",
+		"Examines what elements are in the given directory.",
+		VERSION,
+		"Donnacha Forde",
+		"2023-2024",
+		"@DonnachaForde");
+
+	// pick up default args/switches
+	args.addDefaults();
+	args.requireTarget();
+
+	// specify our switches & aliases
+	args.add("verbose", Arg::NOARG, false, "Display directory details to stdout.", false);
+	args.add("detail", Arg::NOARG, false, "Displays number of certain file types.", false);
+
+
+	// create an arg manager to parse the args
+	ArgManager argMgr = ArgManagerFactory::createInstance();
+	int nRetVal = argMgr.parseAndProcessArgs(args);
+	if (nRetVal != 0)
+	{
+		::exit(0);
+	}
+
+	if (args.isTargetPresent())
+	{
+		execute(args);
+	}
+
+
+	return 0;
 }
+
+
+void execute(Args& args)
+{
+	// get and check the target direct
+	string strTargetDirectory = args.getTarget();
+	if (!espresso::strings::isValidString(strTargetDirectory))
+	{
+		cout << "ERROR: Invalid target director." << endl;
+		::exit(-1);
+	}
+
+	// initialize counters
+	DirectoryCounter dirCounter;
+	dirCounter.nNumDirs = 0;
+	dirCounter.nNumFiles = 0;
+	dirCounter.nNumWordDocs = 0;
+	dirCounter.nNumSpreadsheets = 0;
+	dirCounter.nNumTextFiles = 0;
+
+	// convert string to WIN32 friendly format
+	wstring wstrDirectoryName = wstring(strTargetDirectory.begin(), strTargetDirectory.end());
+
+	// check the target directory exists
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	hFind = ::FindFirstFile(wstrDirectoryName.c_str(), &findData);
+
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		parseDirectory(wstrDirectoryName, args.isPresent("verbose"), dirCounter);
+
+		// write out results
+		cout << dirCounter.nNumDirs << " directories, " << dirCounter.nNumFiles << " files" << endl;
+
+		// if asked, provide details
+		if (args.isPresent("detail"))
+		{
+			cout << dirCounter.nNumWordDocs << " Word docs" << endl
+				<< dirCounter.nNumSpreadsheets << " Spreadsheets" << endl
+				<< dirCounter.nNumTextFiles << " Text files" << endl;
+		}
+	}
+	else
+	{
+		cout << "ERROR: Directory='" << strTargetDirectory << "' does not exist." << endl;
+	}
+
+	return;
+}
+
+
+
+
+void parseDirectory(const wstring& wstrDirectoryName, bool isVerbose, DirectoryCounter& dirCounter)
+{
+	// need to add wildchar for call to FindFirstFile
+	wstring wstrDirectoryPath = wstrDirectoryName;
+	wstrDirectoryPath += L"\\*";
+	
+	HANDLE hFind;
+	WIN32_FIND_DATA findData;
+	hFind = ::FindFirstFile(wstrDirectoryPath.c_str(), &findData);
+
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			// construct full path name
+			wstring wstrPathName = wstrDirectoryName;
+			wstrPathName += L"\\";
+			wstrPathName += findData.cFileName;
+
+			// check for directories
+			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				if (isVerbose)
+				{
+					::wprintf(L"<DIR>  %s\n", wstrPathName.c_str());
+				}
+
+				// skip self and parent dirs - i.e. '.' and '..'
+				if (::wcscmp(L".", findData.cFileName) != 0 && ::wcscmp(L"..", findData.cFileName) != 0)
+				{
+					dirCounter.nNumDirs++;
+
+					// parse subdirectory - recursively
+					wstring wstrSubDirectoryName = wstrDirectoryName;
+					wstrSubDirectoryName += L"\\";
+					wstrSubDirectoryName += findData.cFileName;
+					parseDirectory(wstrSubDirectoryName, isVerbose, dirCounter);
+				}
+			}
+			else 
+			{
+				dirCounter.nNumFiles++;
+				checkFileType(wstrPathName, dirCounter);
+
+				if (isVerbose)
+				{
+					::wprintf(L"<FILE> %s\n", wstrPathName.c_str());
+				}
+			}
+
+		} while (::FindNextFile(hFind, &findData));
+
+		::FindClose(hFind);
+	}
+
+	return;
+}
+
+
+void checkFileType(const wstring& wstrFilename, DirectoryCounter& dirCounter)
+{
+	// determine the file extension
+	wstring extn; 
+	size_t dot = wstrFilename.find_last_of(L".");
+	if (dot != string::npos)
+	{
+		extn = wstrFilename.substr(dot, (wstrFilename.size() - dot));
+	}
+
+	if (!extn.empty())
+	{
+		if (extn == L".xlsx")
+		{
+			dirCounter.nNumSpreadsheets++;
+		}
+		else if (extn == L".docx")
+		{
+			dirCounter.nNumWordDocs++;
+		}
+		else if (extn == L".txt")
+		{
+			dirCounter.nNumTextFiles++;
+		}
+	}
+
+	return;
+}
+
+
+

@@ -31,7 +31,7 @@ using namespace std;
 
 
 // version number
-static const char VERSION[] = "0.10.0-beta";
+static const char VERSION[] = "0.11.0-beta";
 
 
 
